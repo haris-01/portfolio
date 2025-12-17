@@ -1,3 +1,3 @@
 export default function Home() {
-    return <main>In progress</main>;
+  return <main>In progress</main>;
 }
