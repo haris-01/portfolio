@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -16,12 +14,46 @@
   }
 }
 
+html,
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  margin: 0 auto;
+  padding: 0;
+  height: 100%;
+  background: #000;
+}
+
+#__next {
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.dot-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    rgba(200, 200, 200, 0.18) 0.8px,
+    transparent 0.8px
+  );
+
+  background-size: 24px 24px;
+}
+
+.glow-bg {
+  --radius: 220px;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+
+  background: radial-gradient(
+    var(--radius) circle at var(--x, 50%) var(--y, 50%),
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 35%,
+    rgba(0, 0, 0, 0) 70%
+  );
 }
