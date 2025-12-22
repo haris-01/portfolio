@@ -4,8 +4,8 @@
   "private": true,
   "homepage": "https://haris-01.github.io/portfolio",
   "scripts": {
-    "dev": "next dev",
-    "start": "next start",
+    "dev": "node api.js && next dev",
+    "start": "node api.js && next start",
     "lint": "next lint",
     "build": "next build && next export",
     "predeploy": "npm run build",
