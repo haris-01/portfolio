@@ -30,6 +30,9 @@ jobs:
       - name: Build Next.js static site
         run: npm run build
 
+      - name: Remove CNAME for dev branch
+        run: rm -f out/CNAME
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
