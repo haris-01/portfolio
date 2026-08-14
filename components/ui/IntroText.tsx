@@ -44,9 +44,9 @@ export default function IntroText({ reducedMotion }: IntroTextProps) {
 
   return (
     <div className='pointer-events-none fixed inset-0 z-10 flex flex-col items-center justify-end pb-24 md:pb-32 text-center'>
-      <h1 className='intro-name text-4xl md:text-6xl font-bold tracking-tight text-ink'>
+      <p className='intro-name text-4xl md:text-6xl font-bold tracking-tight text-ink'>
         {INTRO_SCENE.name}
-      </h1>
+      </p>
       <p className='intro-role mt-3 text-lg md:text-xl text-ink'>{INTRO_SCENE.role}</p>
       <p className='intro-tagline mt-1 text-xs md:text-sm font-mono uppercase tracking-widest text-warmgray'>
         {INTRO_SCENE.tagline}

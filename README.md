@@ -31,38 +31,18 @@ Deployment is automatic: pushing to `main` triggers
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds
 the static export and publishes it to GitHub Pages.
 
-## Architecture
+## Documentation
 
-The page is two layers stacked on top of each other:
-
-1. **3D layer** — a single fixed-position `<Canvas>` (`components/world/WorldCanvas.tsx`)
-   that renders the active scene's geometry and lighting. It never scrolls; the
-   camera moves *through* it.
-2. **DOM layer** — normal React/Tailwind markup (nav, headings, case-study
-   text) that sits on top, is crawlable, and is what screen readers see.
-
-Scroll position drives everything through one shared, mutable singleton
-(`lib/scrollState.ts`) rather than React state, so nothing re-renders on every
-scroll tick:
-
-```
-scrollState.progress (0 -> 1)
-        |
-        +--> ScrollRig (components/world/ScrollRig.tsx)
-        |        reads it every R3F frame, lerps the camera position/lookAt
-        |
-        +--> Scene geometry (e.g. IntroScene's door hinge)
-        |        reads it every R3F frame to drive object animation
-        |
-        +--> IntroText (components/ui/IntroText.tsx)
-                 reads it via requestAnimationFrame to reveal DOM text in sync
-```
-
-`pages/index.tsx` owns the single `ScrollTrigger` that writes to
-`scrollState.progress` (`scrub: true`, tied to a tall `#intro-trigger` spacer
-div). Everything downstream just *reads* that value — this is the pattern to
-follow when adding new scenes: don't create a second `ScrollTrigger` per
-component, read the shared progress value instead.
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — the two-layer (3D/DOM)
+  model, why scroll state is a mutable singleton instead of React state, camera
+  choreography, and the accessibility/fallback system. Read this first.
+- **[docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md)** — step-by-step recipe
+  for building Scene 02 onward, following the pattern Scene 01 established.
+- **[docs/CONTENT.md](docs/CONTENT.md)** — where copy lives and how to edit
+  it without touching components.
+- **[docs/DESIGN_SPEC.md](docs/DESIGN_SPEC.md)** — the full master design
+  brief that governs every scene, present and future (visual language, color,
+  typography, per-scene requirements, what to avoid).
 
 ### Directory layout
 
@@ -89,25 +69,8 @@ pages/
   index.tsx              page shell: mounts WorldCanvas + IntroText + the scroll spacer
 ```
 
-### Content
-
-All copy lives in `constants/`, never inline in JSX — update `constants/site.ts`
-(name, nav, social links) and `constants/scenes/intro.ts` (Scene 01 text)
-directly; no component changes needed.
-
-### Accessibility & fallbacks
-
-- `prefers-reduced-motion: reduce` skips the scroll-driven camera and text
-  animation entirely; the scene renders as a single static shot with content
-  visible immediately (`useReducedMotion`).
-- No WebGL → a plain 2D DOM fallback section replaces the 3D layer entirely
-  (`useWebGLSupport`, checked in `pages/index.tsx`).
-- Mobile / coarse-pointer devices get reduced geometry, no shadows, a capped
-  device-pixel-ratio, and a wider FOV / closer camera framing tuned for
-  portrait viewports (`useIsMobile`, `simplified` prop threaded through
-  `WorldCanvas` → `IntroScene` / `ScrollRig`).
-- The name/role heading is real DOM content (`<h1>`), not canvas-only text —
-  crawlable and screen-reader accessible.
+Content editing, the accessibility/fallback system, and camera choreography
+are all covered in [docs/](#documentation) above rather than duplicated here.
 
 ## Current state — 3D assets
 
