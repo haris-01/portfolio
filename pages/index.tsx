@@ -1,38 +1,85 @@
 import { useGSAP } from '@gsap/react';
-import { SplitText } from 'gsap/all';
 import gsap from 'gsap';
+import Head from 'next/head';
+import dynamic from 'next/dynamic';
+import { useRef } from 'react';
+import Nav from '@/components/ui/Nav';
+import IntroText from '@/components/ui/IntroText';
+import { SITE } from '@/constants/site';
+import { scrollState } from '@/lib/scrollState';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useWebGLSupport } from '@/hooks/useWebGLSupport';
+import { useIsMobile } from '@/hooks/useIsMobile';
+
+const WorldCanvas = dynamic(() => import('@/components/world/WorldCanvas'), {
+  ssr: false,
+});
+
+const INTRO_TRIGGER_SELECTOR = '#intro-trigger';
 
 export default function Home() {
-  useGSAP(() => {
-    const splitText = new SplitText('.title', { type: 'chars words' });
-    splitText.chars.forEach((characters) => {
-      characters.classList.add('text-gradient');
-    });
-    gsap.from(splitText.chars, {
-      yPercent: 100,
-      duration: 1.8,
-      ease: 'expo.out',
-      stagger: 0.06,
-    });
+  const reducedMotion = useReducedMotion();
+  const webglSupported = useWebGLSupport();
+  const isMobile = useIsMobile();
+  const triggerRef = useRef<HTMLDivElement>(null);
 
-    gsap.to('.designation', {
-      duration: 1,
-      delay: 1.5,
-      scrambleText: {
-        text: 'Senior Software Enginner',
-        chars: 'XOqweqwe',
-        revealDelay: 0.1,
-        speed: 0.1,
+  useGSAP(() => {
+    if (reducedMotion) return;
+
+    const st = gsap.timeline({
+      scrollTrigger: {
+        trigger: INTRO_TRIGGER_SELECTOR,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          scrollState.progress = self.progress;
+        },
       },
     });
-  }, []);
+
+    return () => {
+      st.scrollTrigger?.kill();
+    };
+  }, [reducedMotion]);
+
+  const showWorld = webglSupported !== false;
 
   return (
-    <main>
-      <section className='h-[100vh]  flex items-center justify-center flex-col'>
-        <h1 className='title text-8xl font-bold '>Haris Saeed</h1>
-        <h4 className='designation text-xl text-gradient'> </h4>
-      </section>
-    </main>
+    <>
+      <Head>
+        <title>{`${SITE.name} — ${SITE.role}`}</title>
+        <meta name='description' content={SITE.description} />
+        <meta property='og:title' content={`${SITE.name} — ${SITE.role}`} />
+        <meta property='og:description' content={SITE.description} />
+        <meta property='og:type' content='website' />
+      </Head>
+
+      <Nav />
+
+      <main className='bg-background'>
+        <h1 className='sr-only'>{`${SITE.name} — ${SITE.role}`}</h1>
+
+        {showWorld ? (
+          <>
+            <div className='fixed inset-0 z-0'>
+              <WorldCanvas simplified={isMobile} reducedMotion={reducedMotion} />
+            </div>
+            <IntroText reducedMotion={reducedMotion} />
+            <div id='intro-trigger' ref={triggerRef} className='relative h-[400vh]' />
+          </>
+        ) : (
+          <section className='min-h-screen flex flex-col items-center justify-center text-center px-6'>
+            <h2 className='text-4xl md:text-6xl font-bold tracking-tight text-ink'>
+              {SITE.name}
+            </h2>
+            <p className='mt-3 text-lg md:text-xl text-ink'>{SITE.role}</p>
+            <p className='mt-1 text-xs md:text-sm font-mono uppercase tracking-widest text-warmgray'>
+              {SITE.tagline}
+            </p>
+          </section>
+        )}
+      </main>
+    </>
   );
 }
