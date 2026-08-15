@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { scrollState, easeInOutCubic } from '@/lib/scrollState';
+import { scrollState, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
+import { HALLWAY_END_Z } from '@/components/world/scenes/hallwayLayout';
 
 type ScrollRigProps = {
   simplified: boolean;
@@ -14,19 +15,22 @@ type Waypoint = {
 };
 
 // The camera path is a sequence of waypoints, one per scene boundary.
-// Outside (establishing shot) -> workshop entrance -> desk interior.
-// Portrait/mobile framing sits closer at every leg so the scene fills a
-// tall, narrow viewport instead of leaving empty ground around it.
+// Outside (establishing shot) -> workshop entrance -> desk interior -> down
+// the career hallway. Portrait/mobile framing sits closer at every leg so
+// the scene fills a tall, narrow viewport instead of leaving empty ground
+// around it.
 const WAYPOINTS: Waypoint[] = [
   { at: 0, pos: [0, 3, 22], look: [0, 3, -14] },
-  { at: 0.5, pos: [0, 1.8, 2.5], look: [0, 1.7, -14] },
-  { at: 1, pos: [0, 2.1, -18.5], look: [0, 1.7, -22.5] },
+  { at: SCENE_BOUNDS.desk[0], pos: [0, 1.8, 2.5], look: [0, 1.7, -14] },
+  { at: SCENE_BOUNDS.hallway[0], pos: [0, 2.1, -18.5], look: [0, 1.7, -22.5] },
+  { at: 1, pos: [0, 1.7, HALLWAY_END_Z + 5], look: [0, 1.6, HALLWAY_END_Z + 1] },
 ];
 
 const WAYPOINTS_MOBILE: Waypoint[] = [
   { at: 0, pos: [0, 3, 15], look: [0, 3, -14] },
-  { at: 0.5, pos: [0, 1.8, 2.5], look: [0, 1.7, -14] },
-  { at: 1, pos: [0, 2.1, -17.5], look: [0, 1.7, -22.5] },
+  { at: SCENE_BOUNDS.desk[0], pos: [0, 1.8, 2.5], look: [0, 1.7, -14] },
+  { at: SCENE_BOUNDS.hallway[0], pos: [0, 2.1, -17.5], look: [0, 1.7, -22.5] },
+  { at: 1, pos: [0, 1.7, HALLWAY_END_Z + 5], look: [0, 1.6, HALLWAY_END_Z + 1] },
 ];
 
 function sampleWaypoints(waypoints: Waypoint[], progress: number, outPos: THREE.Vector3, outLook: THREE.Vector3) {

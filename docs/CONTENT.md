@@ -17,33 +17,51 @@ any component or knowing React.
 
 ## Per-scene content
 
-Each scene gets its own file under `constants/scenes/`. Scene 01's is
-[constants/scenes/intro.ts](../constants/scenes/intro.ts):
+Each scene gets its own file under `constants/scenes/`, imported only by that
+scene's components:
 
-```ts
-export const INTRO_SCENE = {
-  name: 'HARIS SAEED',
-  role: 'Software Engineer',
-  tagline: 'AI · Systems · Product',
-  skipLabel: 'Skip experience',
-};
-```
+- [constants/scenes/intro.ts](../constants/scenes/intro.ts) — name, role,
+  tagline, "skip experience" label.
+- [constants/scenes/desk.ts](../constants/scenes/desk.ts) — the monitor's
+  screen copy lines and the tech stack chip list.
+- [constants/scenes/hallway.ts](../constants/scenes/hallway.ts) —
+  `HALLWAY_SCENE.stages`, an ordered array of `{ year, role }` career
+  entries, one per door. **Note:** the array length must match
+  `DOOR_COUNT` in
+  [components/world/scenes/hallwayLayout.ts](../components/world/scenes/hallwayLayout.ts)
+  — that file positions the doors in 3D space and isn't auto-derived from
+  the content array's length.
 
-To change what appears in the intro (the name reveal, role line, tagline, or
-the "skip experience" button label), edit this file only — no other file
-needs to change.
+To change what appears in a scene, edit its constants file only — no
+component changes needed.
 
-When Scene 02+ are built, they'll follow the same convention: a
-`constants/scenes/<name>.ts` file per scene, imported only by that scene's
-components.
+## Color / theme
+
+Every color used anywhere in the app — Tailwind utility classes in the DOM
+layer, and every 3D material/light in the R3F scenes — comes from one file:
+[lib/theme.ts](../lib/theme.ts). Nothing should ever hardcode a hex literal
+in a component; import `THEME` instead.
+
+- `THEME.core` — the design spec's base palette (`background`, `ink`,
+  `metal`, `warmGray`, `surface`, `accent`). These are re-exported as
+  Tailwind utility colors in [tailwind.config.ts](../tailwind.config.ts)
+  (`bg-background`, `text-ink`, `text-accent`, etc.) *and* imported directly
+  into 3D scene files for `meshStandardMaterial`/light colors — both layers
+  read the same values, so they can't drift out of sync.
+- `THEME.material` — a handful of 3D-only extensions (`wood`, `foliage`,
+  `skin`, `ground`, `wallDark`, `sunlight`, `warmGlow`, ...) for things the
+  DOM layer never needs but that should still come from the same restrained,
+  warm palette rather than an arbitrary per-scene pick.
+
+**To re-theme the whole site** — e.g. swap the accent color from burnt
+orange to something else — change the relevant value(s) in `lib/theme.ts`
+once. Every scene and every DOM element using that token updates together.
 
 ## What's not yet content-driven
 
-- 3D geometry (building shape, tree placement, character proportions) lives
-  in scene component files, not constants — geometry isn't really "content"
-  in the copy sense. Colors are Tailwind design tokens in
-  [tailwind.config.ts](../tailwind.config.ts) if you want to adjust the
-  palette (`background`, `ink`, `metal`, `warmgray`, `surface`, `accent`).
-- Project case studies, the career timeline, and AI/RAG pipeline content
-  don't exist yet — those land with their respective scenes (Project Lab,
-  Career Hallway, AI Lab) per [DESIGN_SPEC.md](DESIGN_SPEC.md).
+- 3D geometry (building shape, tree placement, door spacing, character
+  proportions) lives in scene component files, not constants — geometry
+  isn't really "content" in the copy sense.
+- Project case studies and AI/RAG pipeline content don't exist yet — those
+  land with their respective scenes (Project Lab, AI Lab) per
+  [DESIGN_SPEC.md](DESIGN_SPEC.md).

@@ -53,34 +53,62 @@ writes; everything else reads.
 ## Camera choreography
 
 [components/world/ScrollRig.tsx](../components/world/ScrollRig.tsx) owns the
-camera. It defines a `START_POS`/`START_LOOK` (wide establishing shot) and an
-`END_POS`/`END_LOOK` (close to the entrance), and on every frame:
+camera. The path is a sequence of **waypoints** — `WAYPOINTS` is `[{ at: 0,
+pos, look }, { at: 1/3, ... }, { at: 2/3, ... }, { at: 1, ... }]`, one entry
+per scene boundary (currently: outside → workshop entrance → desk → hallway
+end). On every frame, `ScrollRig`:
 
-1. Eases `scrollState.progress` through `easeInOutCubic` (never a linear or
-   sudden move — see spec §21, "Camera Principles").
-2. Lerps a *target* position/look-at between start and end using the eased
-   value.
-3. Smooths the *current* position/look-at toward that target using a
+1. Finds whichever two waypoints bracket the current `scrollState.progress`.
+2. Eases the local position between them through `easeInOutCubic` (never a
+   linear or sudden move — see spec §21, "Camera Principles").
+3. Lerps a *target* position/look-at between those two waypoints using the
+   eased value.
+4. Smooths the *current* position/look-at toward that target using a
    frame-rate-independent lerp (`1 - Math.pow(0.001, delta)`), so the camera
    reads as fluid even though the underlying scrub value can be jumpy (fast
    flicks, trackpad inertia, etc).
 
-Mobile gets its own waypoint set (`WAYPOINTS_MOBILE`, generally closer) plus a
-wider FOV set on the `<Canvas>` in `WorldCanvas.tsx` — portrait viewports need
-a different composition, not just a scaled-down desktop shot. See
+Adding a new scene means adding one more waypoint at its boundary — the
+interpolation logic itself doesn't change. Mobile gets its own waypoint set
+(`WAYPOINTS_MOBILE`, generally closer) plus a wider FOV set on the `<Canvas>`
+in `WorldCanvas.tsx` — portrait viewports need a different composition, not
+just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
 
-As of Scene 02, the camera path is a sequence of **waypoints** rather than a
-single start/end pair: `WAYPOINTS` is `[{ at: 0, ... }, { at: 0.5, ... }, { at:
-1, ... }]`, one entry per scene boundary, and `ScrollRig` interpolates between
-whichever two waypoints bracket the current `scrollState.progress`, easing
-locally within that leg. Adding Scene 03 means adding one more waypoint at
-its boundary — the interpolation logic doesn't change. `lib/scrollState.ts`
-exports `SCENE_BOUNDS` (the `{ intro: [0, 0.5], desk: [0.5, 1] }` breakpoints)
-and `localProgress(global, start, end)`, which every scene and DOM-text
-component uses to map the shared global progress into its own local `0–1`
-range — see how `DeskScene`'s monitor-wake `useFrame` and `DeskText`'s reveal
-timing both do this.
+`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/3],
+desk: [1/3, 2/3], hallway: [2/3, 1] }`) and `localProgress(global, start,
+end)`, which every scene and DOM-text component uses to map the shared
+global progress into its own local `0–1` range — see how `DeskScene`'s
+monitor-wake `useFrame` and `DeskText`'s reveal timing both do this. **A
+scene's threshold logic must always go through `localProgress` against its
+own `SCENE_BOUNDS` entry, never raw `scrollState.progress`** — an early
+version of the intro door-open animation used a raw `0.8–1.0` threshold that
+was correct when intro was the only scene, then silently landed inside the
+*desk* scene's range once Scene 02 shrank intro's share of the global
+timeline. The bug produced no error; the door just opened at the wrong
+moment. Fixed by rebasing the threshold onto `localProgress(scrollState.progress,
+SCENE_BOUNDS.intro[0], SCENE_BOUNDS.intro[1])` — see `IntroScene.tsx`'s
+`Workshop` component.
+
+Camera waypoints are also easy to get wrong at a scene's own geometry: the
+hallway's final `look` target originally pointed a few units *past* the end
+wall rather than at it, and the end wall's material was a near-black hex
+literal — together those made the final frame of the scroll render as solid
+black even though the geometry and lighting were technically all present and
+correct. Always screenshot-verify a new waypoint's exact endpoint (`progress
+= 1` for the last leg), not just mid-transition — see
+[ADDING_A_SCENE.md](ADDING_A_SCENE.md) §7.
+
+## Theming
+
+[lib/theme.ts](../lib/theme.ts) is the single source of truth for every
+color in the app. `THEME.core` mirrors the design spec's base palette and is
+re-exported into Tailwind (`tailwind.config.ts` imports `THEME` directly, so
+`bg-background`/`text-accent`/etc. and the 3D materials can never drift
+apart); `THEME.material` covers a small set of 3D-only extensions (wood,
+foliage, warm light color, ...). No component — DOM or 3D — should ever
+write a hex literal directly; import `THEME` instead. To re-theme the site
+(e.g. change the accent color), edit `lib/theme.ts` once.
 
 ## Object animation
 

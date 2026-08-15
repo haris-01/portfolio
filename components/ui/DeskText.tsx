@@ -9,9 +9,11 @@ type DeskTextProps = {
 };
 
 // screen copy reveals first, then the tech stack chips, in the back half of
-// the desk scene's local progress range
+// the desk scene's local progress range, then both fade out as the camera
+// moves on into the hallway
 const COPY_RANGE: [number, number] = [0.55, 0.8];
 const STACK_RANGE: [number, number] = [0.8, 1];
+const FADE_OUT_SPAN = 0.15; // fraction of the *next* scene's local progress
 
 export default function DeskText({ reducedMotion }: DeskTextProps) {
   const rafRef = useRef<number | null>(null);
@@ -29,8 +31,12 @@ export default function DeskText({ reducedMotion }: DeskTextProps) {
 
     const tick = () => {
       const local = localProgress(scrollState.progress, SCENE_BOUNDS.desk[0], SCENE_BOUNDS.desk[1]);
-      const copy = easeInOutCubic(localProgress(local, COPY_RANGE[0], COPY_RANGE[1]));
-      const stack = easeInOutCubic(localProgress(local, STACK_RANGE[0], STACK_RANGE[1]));
+      const copyReveal = easeInOutCubic(localProgress(local, COPY_RANGE[0], COPY_RANGE[1]));
+      const stackReveal = easeInOutCubic(localProgress(local, STACK_RANGE[0], STACK_RANGE[1]));
+      const hallwayLocal = localProgress(scrollState.progress, SCENE_BOUNDS.hallway[0], SCENE_BOUNDS.hallway[1]);
+      const fadeOut = easeInOutCubic(localProgress(hallwayLocal, 0, FADE_OUT_SPAN));
+      const copy = copyReveal * (1 - fadeOut);
+      const stack = stackReveal * (1 - fadeOut);
       gsap.set('.desk-copy', { opacity: copy, y: (1 - copy) * 10 });
       gsap.set('.desk-stack', { opacity: stack, y: (1 - stack) * 10 });
       rafRef.current = requestAnimationFrame(tick);

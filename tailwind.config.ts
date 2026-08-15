@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import { THEME } from './lib/theme'
 
 const config: Config = {
   content: [
@@ -9,12 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#F3F1EB',
-        ink: '#171717',
-        metal: '#30302E',
-        warmgray: '#8F8B82',
-        surface: '#E8E5DD',
-        accent: '#C6511F',
+        background: THEME.core.background,
+        ink: THEME.core.ink,
+        metal: THEME.core.metal,
+        warmgray: THEME.core.warmGray,
+        surface: THEME.core.surface,
+        accent: THEME.core.accent,
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

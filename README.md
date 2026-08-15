@@ -5,10 +5,12 @@ a stylized engineering workshop, built with React Three Fiber and GSAP
 ScrollTrigger on top of Next.js, deployed as a static export to GitHub Pages.
 
 This is a **phased build**. So far: Scene 01 (the intro, outside the
-workshop) and Scene 02 (the desk — the camera continues inward as the monitor
-wakes and the intro copy/tech stack reveal on screen). Later phases add the
-remaining scenes (Career Hallway, Project Lab, Engineering Room, AI Lab,
-Experiment Room, White Room, Landscape) following the same pattern.
+workshop), Scene 02 (the desk — the camera continues inward as the monitor
+wakes and the intro copy/tech stack reveal on screen), and Scene 03 (the
+career hallway — the camera moves down a corridor as door lights activate and
+year/role labels cycle in). Later phases add the remaining scenes (Project
+Lab, Engineering Room, AI Lab, Experiment Room, White Room, Landscape)
+following the same pattern.
 
 ## Stack
 
@@ -50,9 +52,10 @@ the static export and publishes it to GitHub Pages.
 ```
 constants/            content — copy, nav items, per-scene text (edit here, not in components)
   site.ts
-  scenes/intro.ts, desk.ts
+  scenes/intro.ts, desk.ts, hallway.ts
 lib/
   scrollState.ts       shared scroll-progress singleton, scene boundaries, easing helper
+  theme.ts             single source of truth for color — DOM (Tailwind) and 3D both read this
 hooks/
   useReducedMotion.ts  prefers-reduced-motion, via useSyncExternalStore
   useIsMobile.ts        coarse-pointer / narrow-viewport detection
@@ -65,10 +68,13 @@ components/
     scenes/
       IntroScene.tsx     Scene 01 geometry (workshop, door, trees, character)
       DeskScene.tsx       Scene 02 geometry (desk, monitor wake, character, room shell)
+      HallwayScene.tsx     Scene 03 geometry (corridor, career-stage doors, ceiling lights)
+      hallwayLayout.ts      shared corridor/door position constants (scene + camera both use it)
   ui/
     Nav.tsx              fixed nav + "skip experience"
     IntroText.tsx         name/role/tagline reveal, synced to scrollState
     DeskText.tsx           desk-screen copy + tech stack reveal, synced to scrollState
+    HallwayText.tsx         per-door year/role label, synced to scrollState
 pages/
   index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer
 ```
@@ -89,14 +95,14 @@ architecture.
 
 The reduced-motion fallback currently only presents Scene 01 as a static
 shot; Scene 02+ content stays hidden in that mode rather than animating in
-(see the note in `DeskText.tsx`). A proper non-cinematic, stacked fallback
-that surfaces every scene's content without the scroll-driven camera is
-tracked as follow-up work.
+(see the note in `DeskText.tsx`/`HallwayText.tsx`). A proper non-cinematic,
+stacked fallback that surfaces every scene's content without the
+scroll-driven camera is tracked as follow-up work.
 
 ## What's next
 
 - Guide for creating/sourcing the character and prop 3D models
-- Scene 03 (Career Hallway) and onward, following the same
+- Scene 04 (Project Lab) and onward, following the same
   read-the-shared-scrollState pattern established here (see
   [docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md))
 - A real reduced-motion fallback that covers every scene, not just Scene 01
