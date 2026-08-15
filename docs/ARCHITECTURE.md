@@ -65,10 +65,22 @@ camera. It defines a `START_POS`/`START_LOOK` (wide establishing shot) and an
    reads as fluid even though the underlying scrub value can be jumpy (fast
    flicks, trackpad inertia, etc).
 
-Mobile gets its own `START_POS_MOBILE`/`END_POS_MOBILE` (closer) plus a wider
-FOV set on the `<Canvas>` in `WorldCanvas.tsx` — portrait viewports need a
-different composition, not just a scaled-down desktop shot. See
+Mobile gets its own waypoint set (`WAYPOINTS_MOBILE`, generally closer) plus a
+wider FOV set on the `<Canvas>` in `WorldCanvas.tsx` — portrait viewports need
+a different composition, not just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
+
+As of Scene 02, the camera path is a sequence of **waypoints** rather than a
+single start/end pair: `WAYPOINTS` is `[{ at: 0, ... }, { at: 0.5, ... }, { at:
+1, ... }]`, one entry per scene boundary, and `ScrollRig` interpolates between
+whichever two waypoints bracket the current `scrollState.progress`, easing
+locally within that leg. Adding Scene 03 means adding one more waypoint at
+its boundary — the interpolation logic doesn't change. `lib/scrollState.ts`
+exports `SCENE_BOUNDS` (the `{ intro: [0, 0.5], desk: [0.5, 1] }` breakpoints)
+and `localProgress(global, start, end)`, which every scene and DOM-text
+component uses to map the shared global progress into its own local `0–1`
+range — see how `DeskScene`'s monitor-wake `useFrame` and `DeskText`'s reveal
+timing both do this.
 
 ## Object animation
 

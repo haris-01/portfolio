@@ -1,5 +1,7 @@
 import { Canvas } from '@react-three/fiber';
+import Environment from '@/components/world/Environment';
 import IntroScene from '@/components/world/scenes/IntroScene';
+import DeskScene from '@/components/world/scenes/DeskScene';
 import ScrollRig from '@/components/world/ScrollRig';
 
 type WorldCanvasProps = {
@@ -20,7 +22,9 @@ export default function WorldCanvas({ simplified, reducedMotion }: WorldCanvasPr
       }}
       gl={{ antialias: !simplified }}
     >
+      <Environment simplified={simplified} />
       <IntroScene simplified={simplified} />
+      <DeskScene simplified={simplified} />
       {!reducedMotion && <ScrollRig simplified={simplified} />}
     </Canvas>
   );

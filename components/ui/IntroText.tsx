@@ -3,14 +3,16 @@ import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { useRef } from 'react';
 import { INTRO_SCENE } from '@/constants/scenes/intro';
-import { scrollState, easeInOutCubic } from '@/lib/scrollState';
+import { scrollState, easeInOutCubic, localProgress, SCENE_BOUNDS } from '@/lib/scrollState';
 
 type IntroTextProps = {
   reducedMotion: boolean;
 };
 
-// text reveals in the final stretch of the approach, once the entrance is close
+// text reveals in the final stretch of the approach, once the entrance is
+// close, then fades back out as the camera moves on into the next scene
 const REVEAL_START = 0.75;
+const FADE_OUT_SPAN = 0.15; // fraction of the *next* scene's local progress
 
 export default function IntroText({ reducedMotion }: IntroTextProps) {
   const rafRef = useRef<number | null>(null);
@@ -28,11 +30,16 @@ export default function IntroText({ reducedMotion }: IntroTextProps) {
     gsap.set(['.intro-role', '.intro-tagline'], { opacity: 0, y: 12 });
 
     const tick = () => {
+      const introLocal = localProgress(scrollState.progress, SCENE_BOUNDS.intro[0], SCENE_BOUNDS.intro[1]);
       const reveal = easeInOutCubic(
-        Math.min(Math.max((scrollState.progress - REVEAL_START) / (1 - REVEAL_START), 0), 1)
+        localProgress(introLocal, REVEAL_START, 1)
       );
-      gsap.set(split.chars, { yPercent: (1 - reveal) * 100, opacity: reveal });
-      gsap.set(['.intro-role', '.intro-tagline'], { opacity: reveal, y: (1 - reveal) * 12 });
+      const nextSceneLocal = localProgress(scrollState.progress, SCENE_BOUNDS.desk[0], SCENE_BOUNDS.desk[1]);
+      const fadeOut = easeInOutCubic(localProgress(nextSceneLocal, 0, FADE_OUT_SPAN));
+      const visible = reveal * (1 - fadeOut);
+
+      gsap.set(split.chars, { yPercent: (1 - visible) * 100, opacity: visible });
+      gsap.set(['.intro-role', '.intro-tagline'], { opacity: visible, y: (1 - visible) * 12 });
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);

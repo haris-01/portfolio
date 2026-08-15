@@ -4,10 +4,11 @@ An immersive, scroll-driven 3D portfolio: a continuous cinematic journey through
 a stylized engineering workshop, built with React Three Fiber and GSAP
 ScrollTrigger on top of Next.js, deployed as a static export to GitHub Pages.
 
-This is a **phased build**. Phase 1 (this codebase) implements the foundational
-architecture plus Scene 01 — the intro, outside the workshop. Later phases add
-the remaining scenes (Desk, Career Hallway, Project Lab, Engineering Room, AI
-Lab, Experiment Room, White Room, Landscape) following the same pattern.
+This is a **phased build**. So far: Scene 01 (the intro, outside the
+workshop) and Scene 02 (the desk — the camera continues inward as the monitor
+wakes and the intro copy/tech stack reveal on screen). Later phases add the
+remaining scenes (Career Hallway, Project Lab, Engineering Room, AI Lab,
+Experiment Room, White Room, Landscape) following the same pattern.
 
 ## Stack
 
@@ -49,9 +50,9 @@ the static export and publishes it to GitHub Pages.
 ```
 constants/            content — copy, nav items, per-scene text (edit here, not in components)
   site.ts
-  scenes/intro.ts
+  scenes/intro.ts, desk.ts
 lib/
-  scrollState.ts       shared scroll-progress singleton + easing helper
+  scrollState.ts       shared scroll-progress singleton, scene boundaries, easing helper
 hooks/
   useReducedMotion.ts  prefers-reduced-motion, via useSyncExternalStore
   useIsMobile.ts        coarse-pointer / narrow-viewport detection
@@ -59,14 +60,17 @@ hooks/
 components/
   world/
     WorldCanvas.tsx     <Canvas> wrapper, dynamically imported (ssr:false)
-    ScrollRig.tsx        camera controller, reads scrollState each frame
+    Environment.tsx      shared ground/fog/lighting, used by every scene
+    ScrollRig.tsx         multi-waypoint camera controller, reads scrollState each frame
     scenes/
-      IntroScene.tsx     Scene 01 geometry (ground, workshop, door, trees, character)
+      IntroScene.tsx     Scene 01 geometry (workshop, door, trees, character)
+      DeskScene.tsx       Scene 02 geometry (desk, monitor wake, character, room shell)
   ui/
     Nav.tsx              fixed nav + "skip experience"
     IntroText.tsx         name/role/tagline reveal, synced to scrollState
+    DeskText.tsx           desk-screen copy + tech stack reveal, synced to scrollState
 pages/
-  index.tsx              page shell: mounts WorldCanvas + IntroText + the scroll spacer
+  index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer
 ```
 
 Content editing, the accessibility/fallback system, and camera choreography
@@ -75,15 +79,25 @@ are all covered in [docs/](#documentation) above rather than duplicated here.
 ## Current state — 3D assets
 
 All geometry right now is built from primitives (boxes, cones, capsules) —
-there are no external `.glb` models yet. This keeps Phase 1 dependency-free
+there are no external `.glb` models yet. This keeps things dependency-free
 while the scaffold is being validated. Swapping in real models later is a
-drop-in change scoped to the relevant scene file (e.g.
-`IntroScene.tsx`'s `Character` component) and doesn't touch the scroll/camera
+drop-in change scoped to each scene file (e.g. `IntroScene.tsx`'s/
+`DeskScene.tsx`'s `Character` components) and doesn't touch the scroll/camera
 architecture.
+
+## Known limitation
+
+The reduced-motion fallback currently only presents Scene 01 as a static
+shot; Scene 02+ content stays hidden in that mode rather than animating in
+(see the note in `DeskText.tsx`). A proper non-cinematic, stacked fallback
+that surfaces every scene's content without the scroll-driven camera is
+tracked as follow-up work.
 
 ## What's next
 
 - Guide for creating/sourcing the character and prop 3D models
-- Scene 02 (Desk) and onward, following the same read-the-shared-scrollState
-  pattern established here
+- Scene 03 (Career Hallway) and onward, following the same
+  read-the-shared-scrollState pattern established here (see
+  [docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md))
+- A real reduced-motion fallback that covers every scene, not just Scene 01
 - Project case study content (2D layer, per spec)

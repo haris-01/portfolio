@@ -35,22 +35,29 @@ Scene 01 and the design spec:
 
 ## 3. Camera path
 
-Scene transitions are camera moves between a scene's start and end framing.
-Extend [ScrollRig.tsx](../components/world/ScrollRig.tsx) — either:
+[ScrollRig.tsx](../components/world/ScrollRig.tsx) drives the camera through
+a `WAYPOINTS` array — one entry per scene boundary, each `{ at: <global
+progress>, pos, look }`. Adding a scene means adding one more waypoint at the
+`at` value where the new scene should be fully framed (e.g. Scene 03 would
+add `{ at: 1, ... }` and shift Scene 02's waypoint back to `{ at: 0.667,
+... }`, redividing `SCENE_BOUNDS` (below) to match). Do the
+same for `WAYPOINTS_MOBILE`. `ScrollRig` finds whichever two waypoints
+bracket the current `scrollState.progress` and lerps between them with
+`easeInOutCubic` automatically — you don't touch the interpolation logic.
 
-- Add new start/end position constants for the next leg of the journey and
-  extend the progress range this scene owns (e.g. Scene 01 owns
-  `[0, 1]`; a second scene would own its own sub-range once scenes are
-  composed into one continuous timeline), or
-- If scenes are being kept as separate mounted components with their own
-  scroll spacer (simplest to reason about while iterating scene-by-scene),
-  give the new scene its own `ScrollRig`-style camera rig reading a
-  scene-scoped progress value, and revisit unifying it into one continuous
-  camera path once several scenes exist side by side.
+**Before picking a waypoint's `pos`/`look`, place the scene's geometry
+first** and sanity-check the camera doesn't fly past or end up inside it —
+this bit Scene 02: the first pass put the final camera position *behind* the
+monitor mesh, so the "approach the desk" shot was actually looking at the
+inside-out backface of a giant, screen-filling monitor. Fixed by keeping the
+final waypoint in front of the scene's geometry rather than past it. Verify
+by screenshotting near the scene's end-of-range progress, not just its
+midpoint.
 
-Whichever approach: ease with `easeInOutCubic` (or add new easing curves to
-[lib/scrollState.ts](../lib/scrollState.ts) if a scene needs a different
-feel), never move the camera in sudden jumps (spec §21).
+Also update `SCENE_BOUNDS` in
+[lib/scrollState.ts](../lib/scrollState.ts) — every scene's boundary must be
+listed there so its geometry and DOM text can compute their own local
+progress via `localProgress()`.
 
 ## 4. DOM content layer
 

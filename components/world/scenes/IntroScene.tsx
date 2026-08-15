@@ -7,15 +7,6 @@ type IntroSceneProps = {
   simplified: boolean;
 };
 
-function Ground() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
-      <planeGeometry args={[200, 200]} />
-      <meshStandardMaterial color='#DAD5C8' />
-    </mesh>
-  );
-}
-
 function Workshop() {
   const doorHinge = useRef<THREE.Group>(null);
 
@@ -96,15 +87,6 @@ export default function IntroScene({ simplified }: IntroSceneProps) {
 
   return (
     <>
-      <fog attach='fog' args={['#F3F1EB', 12, simplified ? 32 : 45]} />
-      <ambientLight intensity={0.65} color='#F3F1EB' />
-      <directionalLight
-        position={[8, 10, 6]}
-        intensity={1.1}
-        color='#FFF3E4'
-        castShadow={!simplified}
-      />
-      <Ground />
       <Workshop />
       <Character />
       {trees.map((position, i) => (

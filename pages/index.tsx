@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRef } from 'react';
 import Nav from '@/components/ui/Nav';
 import IntroText from '@/components/ui/IntroText';
+import DeskText from '@/components/ui/DeskText';
 import { SITE } from '@/constants/site';
 import { scrollState } from '@/lib/scrollState';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -15,7 +16,7 @@ const WorldCanvas = dynamic(() => import('@/components/world/WorldCanvas'), {
   ssr: false,
 });
 
-const INTRO_TRIGGER_SELECTOR = '#intro-trigger';
+const SCROLL_TRIGGER_SELECTOR = '#scroll-trigger';
 
 export default function Home() {
   const reducedMotion = useReducedMotion();
@@ -28,7 +29,7 @@ export default function Home() {
 
     const st = gsap.timeline({
       scrollTrigger: {
-        trigger: INTRO_TRIGGER_SELECTOR,
+        trigger: SCROLL_TRIGGER_SELECTOR,
         start: 'top top',
         end: 'bottom bottom',
         scrub: true,
@@ -66,7 +67,8 @@ export default function Home() {
               <WorldCanvas simplified={isMobile} reducedMotion={reducedMotion} />
             </div>
             <IntroText reducedMotion={reducedMotion} />
-            <div id='intro-trigger' ref={triggerRef} className='relative h-[400vh]' />
+            <DeskText reducedMotion={reducedMotion} />
+            <div id='scroll-trigger' ref={triggerRef} className='relative h-[800vh]' />
           </>
         ) : (
           <section className='min-h-screen flex flex-col items-center justify-center text-center px-6'>
