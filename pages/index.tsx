@@ -7,6 +7,7 @@ import Nav from '@/components/ui/Nav';
 import IntroText from '@/components/ui/IntroText';
 import DeskText from '@/components/ui/DeskText';
 import HallwayText from '@/components/ui/HallwayText';
+import LabText from '@/components/ui/LabText';
 import { SITE } from '@/constants/site';
 import { scrollState } from '@/lib/scrollState';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -70,7 +71,8 @@ export default function Home() {
             <IntroText reducedMotion={reducedMotion} />
             <DeskText reducedMotion={reducedMotion} />
             <HallwayText reducedMotion={reducedMotion} />
-            <div id='scroll-trigger' ref={triggerRef} className='relative h-[1200vh]' />
+            <LabText reducedMotion={reducedMotion} />
+            <div id='scroll-trigger' ref={triggerRef} className='relative h-[1600vh]' />
           </>
         ) : (
           <section className='min-h-screen flex flex-col items-center justify-center text-center px-6'>

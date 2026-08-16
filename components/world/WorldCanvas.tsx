@@ -3,6 +3,7 @@ import Environment from '@/components/world/Environment';
 import IntroScene from '@/components/world/scenes/IntroScene';
 import DeskScene from '@/components/world/scenes/DeskScene';
 import HallwayScene from '@/components/world/scenes/HallwayScene';
+import LabScene from '@/components/world/scenes/LabScene';
 import ScrollRig from '@/components/world/ScrollRig';
 
 type WorldCanvasProps = {
@@ -27,6 +28,7 @@ export default function WorldCanvas({ simplified, reducedMotion }: WorldCanvasPr
       <IntroScene simplified={simplified} />
       <DeskScene simplified={simplified} />
       <HallwayScene simplified={simplified} />
+      <LabScene simplified={simplified} />
       {!reducedMotion && <ScrollRig simplified={simplified} />}
     </Canvas>
   );

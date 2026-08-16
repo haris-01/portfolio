@@ -6,11 +6,16 @@ ScrollTrigger on top of Next.js, deployed as a static export to GitHub Pages.
 
 This is a **phased build**. So far: Scene 01 (the intro, outside the
 workshop), Scene 02 (the desk — the camera continues inward as the monitor
-wakes and the intro copy/tech stack reveal on screen), and Scene 03 (the
-career hallway — the camera moves down a corridor as door lights activate and
-year/role labels cycle in). Later phases add the remaining scenes (Project
-Lab, Engineering Room, AI Lab, Experiment Room, White Room, Landscape)
-following the same pattern.
+wakes and the intro copy/tech stack reveal on screen), Scene 03 (the career
+hallway — the camera moves down a corridor as door lights activate and
+year/role labels cycle in), and Scene 04 (the project lab — three project
+"installations" light up in sequence as the camera passes each one, revealing
+title/tagline/stack). Later phases add the remaining scenes (Engineering
+Room, AI Lab, Experiment Room, White Room, Landscape) following the same
+pattern. Scene 04 currently only covers the 3D reveal (title/tagline/stack,
+matching Scenes 01–03's tier) — the full 2D case-study layer the design spec
+describes (problem/solution/architecture/screenshots) is tracked separately,
+see [What's next](#whats-next).
 
 ## Stack
 
@@ -52,7 +57,7 @@ the static export and publishes it to GitHub Pages.
 ```
 constants/            content — copy, nav items, per-scene text (edit here, not in components)
   site.ts
-  scenes/intro.ts, desk.ts, hallway.ts
+  scenes/intro.ts, desk.ts, hallway.ts, lab.ts
 lib/
   scrollState.ts       shared scroll-progress singleton, scene boundaries, easing helper
   theme.ts             single source of truth for color — DOM (Tailwind) and 3D both read this
@@ -70,11 +75,14 @@ components/
       DeskScene.tsx       Scene 02 geometry (desk, monitor wake, character, room shell)
       HallwayScene.tsx     Scene 03 geometry (corridor, career-stage doors, ceiling lights)
       hallwayLayout.ts      shared corridor/door position constants (scene + camera both use it)
+      LabScene.tsx          Scene 04 geometry (room, project installation pods)
+      labLayout.ts           shared pod position constants (scene + camera both use it)
   ui/
     Nav.tsx              fixed nav + "skip experience"
     IntroText.tsx         name/role/tagline reveal, synced to scrollState
     DeskText.tsx           desk-screen copy + tech stack reveal, synced to scrollState
     HallwayText.tsx         per-door year/role label, synced to scrollState
+    LabText.tsx              per-project title/tagline/stack reveal, synced to scrollState
 pages/
   index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer
 ```
@@ -102,8 +110,12 @@ scroll-driven camera is tracked as follow-up work.
 ## What's next
 
 - Guide for creating/sourcing the character and prop 3D models
-- Scene 04 (Project Lab) and onward, following the same
+- Scene 05 (Engineering Room) and onward, following the same
   read-the-shared-scrollState pattern established here (see
   [docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md))
 - A real reduced-motion fallback that covers every scene, not just Scene 01
-- Project case study content (2D layer, per spec)
+- The 2D case-study layer for Scene 04's projects (problem/solution/
+  architecture/screenshots per spec §13) — currently only the 3D reveal
+  (title/tagline/stack) exists
+- Real project content in `constants/scenes/lab.ts` to replace the current
+  placeholders

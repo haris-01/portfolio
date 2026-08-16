@@ -31,6 +31,12 @@ scene's components:
   [components/world/scenes/hallwayLayout.ts](../components/world/scenes/hallwayLayout.ts)
   — that file positions the doors in 3D space and isn't auto-derived from
   the content array's length.
+- [constants/scenes/lab.ts](../constants/scenes/lab.ts) — `LAB_SCENE.projects`,
+  an ordered array of `{ title, tagline, stack }` entries, one per
+  installation pod. **All three are still placeholder projects** — replace
+  with real ones before shipping. Same note as hallway: the array length
+  must match `POD_COUNT` in
+  [components/world/scenes/labLayout.ts](../components/world/scenes/labLayout.ts).
 
 To change what appears in a scene, edit its constants file only — no
 component changes needed.
@@ -62,6 +68,8 @@ once. Every scene and every DOM element using that token updates together.
 - 3D geometry (building shape, tree placement, door spacing, character
   proportions) lives in scene component files, not constants — geometry
   isn't really "content" in the copy sense.
-- Project case studies and AI/RAG pipeline content don't exist yet — those
-  land with their respective scenes (Project Lab, AI Lab) per
+- The full 2D case-study layer (problem/solution/architecture/screenshots,
+  spec §13) for Scene 04's projects doesn't exist yet — only the 3D
+  title/tagline/stack reveal does. AI/RAG pipeline content (Scene 06) also
+  doesn't exist yet. These land as their own follow-up work per
   [DESIGN_SPEC.md](DESIGN_SPEC.md).

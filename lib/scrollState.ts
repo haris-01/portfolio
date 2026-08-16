@@ -12,9 +12,10 @@ export function easeInOutCubic(t: number) {
 // contiguous span per scene. Each scene reads its own slice via
 // localProgress() rather than the raw global value.
 export const SCENE_BOUNDS = {
-  intro: [0, 1 / 3] as const,
-  desk: [1 / 3, 2 / 3] as const,
-  hallway: [2 / 3, 1] as const,
+  intro: [0, 1 / 4] as const,
+  desk: [1 / 4, 1 / 2] as const,
+  hallway: [1 / 2, 3 / 4] as const,
+  lab: [3 / 4, 1] as const,
 };
 
 export function localProgress(global: number, start: number, end: number) {

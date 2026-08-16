@@ -54,9 +54,9 @@ writes; everything else reads.
 
 [components/world/ScrollRig.tsx](../components/world/ScrollRig.tsx) owns the
 camera. The path is a sequence of **waypoints** — `WAYPOINTS` is `[{ at: 0,
-pos, look }, { at: 1/3, ... }, { at: 2/3, ... }, { at: 1, ... }]`, one entry
-per scene boundary (currently: outside → workshop entrance → desk → hallway
-end). On every frame, `ScrollRig`:
+pos, look }, { at: 1/4, ... }, { at: 1/2, ... }, { at: 3/4, ... }, { at: 1,
+... }]`, one entry per scene boundary (currently: outside → workshop entrance
+→ desk → hallway entrance → last lab pod). On every frame, `ScrollRig`:
 
 1. Finds whichever two waypoints bracket the current `scrollState.progress`.
 2. Eases the local position between them through `easeInOutCubic` (never a
@@ -75,9 +75,10 @@ in `WorldCanvas.tsx` — portrait viewports need a different composition, not
 just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
 
-`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/3],
-desk: [1/3, 2/3], hallway: [2/3, 1] }`) and `localProgress(global, start,
-end)`, which every scene and DOM-text component uses to map the shared
+`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/4],
+desk: [1/4, 1/2], hallway: [1/2, 3/4], lab: [3/4, 1] }`) and
+`localProgress(global, start, end)`, which every scene and DOM-text
+component uses to map the shared
 global progress into its own local `0–1` range — see how `DeskScene`'s
 monitor-wake `useFrame` and `DeskText`'s reveal timing both do this. **A
 scene's threshold logic must always go through `localProgress` against its
@@ -98,6 +99,18 @@ black even though the geometry and lighting were technically all present and
 correct. Always screenshot-verify a new waypoint's exact endpoint (`progress
 = 1` for the last leg), not just mid-transition — see
 [ADDING_A_SCENE.md](ADDING_A_SCENE.md) §7.
+
+Same category of bug showed up again in the lab: its pods alternate sides
+(`podPosition()` in
+[labLayout.ts](../components/world/scenes/labLayout.ts) offsets `x` by
+`±5`), but the first version of the final waypoint looked straight down the
+room's centerline (`x: 0`). The last pod was almost entirely out of frame —
+not because it was unlit, but because the camera was pointed at empty wall
+next to it. Fixed by deriving the waypoint's `x` directly from
+`podPosition(POD_COUNT - 1)` instead of a hardcoded `0`. **When a scene's
+geometry isn't centered on the room's axis, the camera waypoint has to know
+that — derive it from the same layout constants the geometry uses, don't
+eyeball a position.**
 
 ## Theming
 
