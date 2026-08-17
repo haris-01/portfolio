@@ -54,9 +54,10 @@ writes; everything else reads.
 
 [components/world/ScrollRig.tsx](../components/world/ScrollRig.tsx) owns the
 camera. The path is a sequence of **waypoints** — `WAYPOINTS` is `[{ at: 0,
-pos, look }, { at: 1/4, ... }, { at: 1/2, ... }, { at: 3/4, ... }, { at: 1,
-... }]`, one entry per scene boundary (currently: outside → workshop entrance
-→ desk → hallway entrance → last lab pod). On every frame, `ScrollRig`:
+pos, look }, { at: 1/5, ... }, { at: 2/5, ... }, { at: 3/5, ... }, { at: 4/5,
+... }, { at: 1, ... }]`, one entry per scene boundary (currently: outside →
+workshop entrance → desk → hallway entrance → lab entrance → last engineering
+rack). On every frame, `ScrollRig`:
 
 1. Finds whichever two waypoints bracket the current `scrollState.progress`.
 2. Eases the local position between them through `easeInOutCubic` (never a
@@ -75,9 +76,9 @@ in `WorldCanvas.tsx` — portrait viewports need a different composition, not
 just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
 
-`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/4],
-desk: [1/4, 1/2], hallway: [1/2, 3/4], lab: [3/4, 1] }`) and
-`localProgress(global, start, end)`, which every scene and DOM-text
+`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/5],
+desk: [1/5, 2/5], hallway: [2/5, 3/5], lab: [3/5, 4/5], engineering: [4/5, 1]
+}`) and `localProgress(global, start, end)`, which every scene and DOM-text
 component uses to map the shared
 global progress into its own local `0–1` range — see how `DeskScene`'s
 monitor-wake `useFrame` and `DeskText`'s reveal timing both do this. **A
@@ -110,7 +111,12 @@ next to it. Fixed by deriving the waypoint's `x` directly from
 `podPosition(POD_COUNT - 1)` instead of a hardcoded `0`. **When a scene's
 geometry isn't centered on the room's axis, the camera waypoint has to know
 that — derive it from the same layout constants the geometry uses, don't
-eyeball a position.**
+eyeball a position.** Scene 05's engineering room reuses the identical
+alternating-side layout (`nodePosition()` in
+[engineeringLayout.ts](../components/world/scenes/engineeringLayout.ts)) and
+got its final waypoint's `x` right on the first attempt by following this
+same rule — screenshot-verify the pattern holds, don't just trust it because
+it worked last time.
 
 ## Theming
 
@@ -139,7 +145,13 @@ useFrame(() => {
 ```
 
 Per spec §22: every animation must have a reason (a door opens because you're
-arriving; nothing spins or floats without cause).
+arriving; nothing spins or floats without cause). The engineering room's
+`Packet` component ([EngineeringScene.tsx](../components/world/scenes/EngineeringScene.tsx))
+is a continuous version of the same idea: instead of only lighting up nodes
+as they're passed, a small sphere glides the entire length of the room
+(`lerp(FIRST_NODE_Z, LAST_NODE_Z, ...)`) independent of any single node's
+activation window — visualizing data literally moving through the pipeline
+rather than implying it through node-by-node lighting alone.
 
 ## Accessibility & fallbacks
 

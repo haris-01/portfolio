@@ -2,6 +2,7 @@ import { SITE, SOCIAL_LINKS } from '@/constants/site';
 import { DESK_SCENE } from '@/constants/scenes/desk';
 import { HALLWAY_SCENE } from '@/constants/scenes/hallway';
 import { LAB_SCENE } from '@/constants/scenes/lab';
+import { ENGINEERING_SCENE } from '@/constants/scenes/engineering';
 
 // Non-cinematic, stacked presentation of every scene's content — used when
 // prefers-reduced-motion is set (spec §28: "replace cinematic camera
@@ -74,6 +75,18 @@ export default function StaticFallback() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className='min-h-screen flex flex-col items-center justify-center px-6'>
+        <h3 className='text-xs font-mono uppercase tracking-widest text-warmgray mb-8'>How it works</h3>
+        <ol className='flex flex-col gap-6 text-center max-w-md'>
+          {ENGINEERING_SCENE.stages.map((stage) => (
+            <li key={stage.name}>
+              <p className='font-mono text-lg md:text-xl font-bold tracking-widest text-accent'>{stage.name}</p>
+              <p className='mt-1 text-sm text-warmgray'>{stage.description}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section id='contact' className='min-h-screen flex flex-col items-center justify-center text-center px-6'>

@@ -37,6 +37,12 @@ scene's components:
   with real ones before shipping. Same note as hallway: the array length
   must match `POD_COUNT` in
   [components/world/scenes/labLayout.ts](../components/world/scenes/labLayout.ts).
+- [constants/scenes/engineering.ts](../constants/scenes/engineering.ts) —
+  `ENGINEERING_SCENE.stages`, an ordered array of `{ name, description }`
+  entries for the request/API/service/database/queue/worker/response data
+  flow, one per server rack. Same length-matching note: must match
+  `NODE_COUNT` in
+  [components/world/scenes/engineeringLayout.ts](../components/world/scenes/engineeringLayout.ts).
 
 To change what appears in a scene, edit its constants file only — no
 component changes needed.
@@ -73,3 +79,7 @@ once. Every scene and every DOM element using that token updates together.
   title/tagline/stack reveal does. AI/RAG pipeline content (Scene 06) also
   doesn't exist yet. These land as their own follow-up work per
   [DESIGN_SPEC.md](DESIGN_SPEC.md).
+- Scene 05's data-flow stages are generic/systems-agnostic by design
+  (request → API → service → database → queue → worker → response) rather
+  than placeholders needing real content — unlike hallway/lab, there's
+  nothing project-specific to swap in here.
