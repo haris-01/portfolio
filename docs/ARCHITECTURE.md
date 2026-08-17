@@ -54,10 +54,11 @@ writes; everything else reads.
 
 [components/world/ScrollRig.tsx](../components/world/ScrollRig.tsx) owns the
 camera. The path is a sequence of **waypoints** — `WAYPOINTS` is `[{ at: 0,
-pos, look }, { at: 1/5, ... }, { at: 2/5, ... }, { at: 3/5, ... }, { at: 4/5,
-... }, { at: 1, ... }]`, one entry per scene boundary (currently: outside →
-workshop entrance → desk → hallway entrance → lab entrance → last engineering
-rack). On every frame, `ScrollRig`:
+pos, look }, { at: 1/6, ... }, { at: 2/6, ... }, { at: 3/6, ... }, { at: 4/6,
+... }, { at: 5/6, ... }, { at: 1, ... }]`, one entry per scene boundary
+(currently: outside → workshop entrance → desk → hallway entrance → lab
+entrance → engineering entrance → last AI lab marker). On every frame,
+`ScrollRig`:
 
 1. Finds whichever two waypoints bracket the current `scrollState.progress`.
 2. Eases the local position between them through `easeInOutCubic` (never a
@@ -76,9 +77,10 @@ in `WorldCanvas.tsx` — portrait viewports need a different composition, not
 just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
 
-`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/5],
-desk: [1/5, 2/5], hallway: [2/5, 3/5], lab: [3/5, 4/5], engineering: [4/5, 1]
-}`) and `localProgress(global, start, end)`, which every scene and DOM-text
+`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/6],
+desk: [1/6, 2/6], hallway: [2/6, 3/6], lab: [3/6, 4/6], engineering: [4/6,
+5/6], aiLab: [5/6, 1] }`) and `localProgress(global, start, end)`, which
+every scene and DOM-text
 component uses to map the shared
 global progress into its own local `0–1` range — see how `DeskScene`'s
 monitor-wake `useFrame` and `DeskText`'s reveal timing both do this. **A
@@ -116,7 +118,15 @@ alternating-side layout (`nodePosition()` in
 [engineeringLayout.ts](../components/world/scenes/engineeringLayout.ts)) and
 got its final waypoint's `x` right on the first attempt by following this
 same rule — screenshot-verify the pattern holds, don't just trust it because
-it worked last time.
+it worked last time. Scene 06's AI lab pushes the rule one step further:
+`stagePosition()` in
+[aiLabLayout.ts](../components/world/scenes/aiLabLayout.ts) returns a full
+`[x, y, z]` (not just `x, z` like earlier layouts) since markers drift in
+height too, so the final waypoint derives all three axes from
+`stagePosition(STAGE_COUNT - 1)` rather than assuming `y` is constant. Any
+layout function a scene introduces should be treated as the single source of
+truth for that scene's positions — camera waypoints read from it, never
+duplicate or approximate its output.
 
 ## Theming
 

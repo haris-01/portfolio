@@ -43,6 +43,12 @@ scene's components:
   flow, one per server rack. Same length-matching note: must match
   `NODE_COUNT` in
   [components/world/scenes/engineeringLayout.ts](../components/world/scenes/engineeringLayout.ts).
+- [constants/scenes/ai.ts](../constants/scenes/ai.ts) — `AI_LAB_SCENE.stages`,
+  an ordered array of `{ name, description }` entries for the
+  documents/parsing/chunks/embeddings/vector-search/retrieval/LLM/answer RAG
+  pipeline, one per drifting stage marker. Same length-matching note: must
+  match `STAGE_COUNT` in
+  [components/world/scenes/aiLabLayout.ts](../components/world/scenes/aiLabLayout.ts).
 
 To change what appears in a scene, edit its constants file only — no
 component changes needed.
@@ -76,10 +82,9 @@ once. Every scene and every DOM element using that token updates together.
   isn't really "content" in the copy sense.
 - The full 2D case-study layer (problem/solution/architecture/screenshots,
   spec §13) for Scene 04's projects doesn't exist yet — only the 3D
-  title/tagline/stack reveal does. AI/RAG pipeline content (Scene 06) also
-  doesn't exist yet. These land as their own follow-up work per
+  title/tagline/stack reveal does. This lands as its own follow-up work per
   [DESIGN_SPEC.md](DESIGN_SPEC.md).
-- Scene 05's data-flow stages are generic/systems-agnostic by design
-  (request → API → service → database → queue → worker → response) rather
-  than placeholders needing real content — unlike hallway/lab, there's
-  nothing project-specific to swap in here.
+- Scenes 05 and 06's stage content (the data-flow and RAG pipeline steps)
+  are generic/systems-agnostic by design rather than placeholders needing
+  real content — unlike hallway/lab, there's nothing project-specific to
+  swap in here.

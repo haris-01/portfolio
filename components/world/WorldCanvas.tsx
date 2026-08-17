@@ -5,6 +5,7 @@ import DeskScene from '@/components/world/scenes/DeskScene';
 import HallwayScene from '@/components/world/scenes/HallwayScene';
 import LabScene from '@/components/world/scenes/LabScene';
 import EngineeringScene from '@/components/world/scenes/EngineeringScene';
+import AiLabScene from '@/components/world/scenes/AiLabScene';
 import ScrollRig from '@/components/world/ScrollRig';
 
 type WorldCanvasProps = {
@@ -33,6 +34,7 @@ export default function WorldCanvas({ simplified }: WorldCanvasProps) {
       <HallwayScene simplified={simplified} />
       <LabScene simplified={simplified} />
       <EngineeringScene simplified={simplified} />
+      <AiLabScene simplified={simplified} />
       <ScrollRig simplified={simplified} />
     </Canvas>
   );

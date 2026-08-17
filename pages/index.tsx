@@ -9,6 +9,7 @@ import DeskText from '@/components/ui/DeskText';
 import HallwayText from '@/components/ui/HallwayText';
 import LabText from '@/components/ui/LabText';
 import EngineeringText from '@/components/ui/EngineeringText';
+import AiLabText from '@/components/ui/AiLabText';
 import StaticFallback from '@/components/ui/StaticFallback';
 import { SITE } from '@/constants/site';
 import { scrollState } from '@/lib/scrollState';
@@ -81,7 +82,8 @@ export default function Home() {
             <HallwayText />
             <LabText />
             <EngineeringText />
-            <div id='scroll-trigger' ref={triggerRef} className='relative h-[2000vh]' />
+            <AiLabText />
+            <div id='scroll-trigger' ref={triggerRef} className='relative h-[2400vh]' />
           </>
         ) : (
           <StaticFallback />

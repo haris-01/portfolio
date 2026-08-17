@@ -10,14 +10,17 @@ wakes and the intro copy/tech stack reveal on screen), Scene 03 (the career
 hallway — the camera moves down a corridor as door lights activate and
 year/role labels cycle in), Scene 04 (the project lab — three project
 "installations" light up in sequence as the camera passes each one, revealing
-title/tagline/stack), and Scene 05 (the engineering room — a data packet
-travels down a row of server racks as REQUEST → API → SERVICE → DATABASE →
-QUEUE → WORKER → RESPONSE each light up in turn). Later phases add the
-remaining scenes (AI Lab, Experiment Room, White Room, Landscape) following
-the same pattern. Scene 04 currently only covers the 3D reveal
-(title/tagline/stack, matching every other scene's tier) — the full 2D
-case-study layer the design spec describes (problem/solution/architecture/
-screenshots) is tracked separately, see [What's next](#whats-next).
+title/tagline/stack), Scene 05 (the engineering room — a data packet travels
+down a row of server racks as REQUEST → API → SERVICE → DATABASE → QUEUE →
+WORKER → RESPONSE each light up in turn), and Scene 06 (the AI lab — the
+workshop dissolves into an abstract, drifting field of vector-point markers
+as a query travels through DOCUMENTS → PARSING → CHUNKS → EMBEDDINGS →
+VECTOR SEARCH → RETRIEVAL → LLM → ANSWER). Later phases add the remaining
+scenes (Experiment Room, White Room, Landscape) following the same pattern.
+Scene 04 currently only covers the 3D reveal (title/tagline/stack, matching
+every other scene's tier) — the full 2D case-study layer the design spec
+describes (problem/solution/architecture/screenshots) is tracked separately,
+see [What's next](#whats-next).
 
 ## Stack
 
@@ -59,7 +62,7 @@ the static export and publishes it to GitHub Pages.
 ```
 constants/            content — copy, nav items, per-scene text (edit here, not in components)
   site.ts
-  scenes/intro.ts, desk.ts, hallway.ts, lab.ts, engineering.ts
+  scenes/intro.ts, desk.ts, hallway.ts, lab.ts, engineering.ts, ai.ts
 lib/
   scrollState.ts       shared scroll-progress singleton, scene boundaries, easing helper
   theme.ts             single source of truth for color — DOM (Tailwind) and 3D both read this
@@ -81,6 +84,9 @@ components/
       labLayout.ts           shared pod position constants (scene + camera both use it)
       EngineeringScene.tsx    Scene 05 geometry (server racks, traveling data packet)
       engineeringLayout.ts     shared rack position constants (scene + camera both use it)
+      AiLabScene.tsx            Scene 06 geometry (drifting vector markers, ambient
+                                 particles, traveling query)
+      aiLabLayout.ts             shared stage position constants (scene + camera both use it)
   ui/
     Nav.tsx              fixed nav + "skip experience"
     IntroText.tsx         name/role/tagline reveal, synced to scrollState
@@ -88,8 +94,9 @@ components/
     HallwayText.tsx         per-door year/role label, synced to scrollState
     LabText.tsx              per-project title/tagline/stack reveal, synced to scrollState
     EngineeringText.tsx       per-stage name/description reveal, synced to scrollState
-    StaticFallback.tsx        every scene's content, stacked, no canvas/scroll-jacking —
-                               used for reduced-motion and no-WebGL visitors
+    AiLabText.tsx              per-stage name/description reveal, synced to scrollState
+    StaticFallback.tsx          every scene's content, stacked, no canvas/scroll-jacking —
+                                 used for reduced-motion and no-WebGL visitors
 pages/
   index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer,
                           or StaticFallback, depending on showCinematic
@@ -110,7 +117,7 @@ architecture.
 ## What's next
 
 - Guide for creating/sourcing the character and prop 3D models
-- Scene 06 (AI Lab) and onward, following the same
+- Scene 07 (Experiment Room) and onward, following the same
   read-the-shared-scrollState pattern established here (see
   [docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md))
 - The 2D case-study layer for Scene 04's projects (problem/solution/
