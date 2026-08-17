@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 import { THEME } from '@/lib/theme';
+import CharacterModel from '@/components/world/CharacterModel';
 import { LANDSCAPE_START_Z, LANDSCAPE_END_Z, CHARACTER_START_Z, CHARACTER_END_Z } from './landscapeLayout';
 
 type LandscapeSceneProps = {
@@ -45,14 +46,7 @@ function Traveler({ simplified }: { simplified: boolean }) {
 
   return (
     <group ref={group}>
-      <mesh position={[0, 0.9, 0]} castShadow={!simplified}>
-        <capsuleGeometry args={[0.32, 0.9, 4, 8]} />
-        <meshStandardMaterial color={THEME.core.surface} />
-      </mesh>
-      <mesh position={[0, 1.72, 0]} castShadow={!simplified}>
-        <sphereGeometry args={[0.24, 16, 16]} />
-        <meshStandardMaterial color={THEME.material.skin} />
-      </mesh>
+      <CharacterModel simplified={simplified} />
     </group>
   );
 }

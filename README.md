@@ -56,6 +56,9 @@ the static export and publishes it to GitHub Pages.
 - **[docs/DESIGN_SPEC.md](docs/DESIGN_SPEC.md)** — the full master design
   brief that governs every scene (visual language, color, typography,
   per-scene requirements, what to avoid).
+- **[docs/3D_MODELS.md](docs/3D_MODELS.md)** — how to replace the primitive
+  character with a real model: where to source one free, file
+  format/size/compression, and the one-file config change to wire it in.
 
 ### Directory layout
 
@@ -76,6 +79,8 @@ components/
     WorldCanvas.tsx     <Canvas> wrapper, dynamically imported (ssr:false)
     Environment.tsx      shared ground/fog/lighting, used by every scene
     ScrollRig.tsx         multi-waypoint camera controller, reads scrollState each frame
+    CharacterModel.tsx     shared character (GLTF once configured, primitive fallback
+                            until then) — used by 4 of the 9 scenes, see docs/3D_MODELS.md
     scenes/
       IntroScene.tsx     Scene 01 geometry (workshop, door, trees, character)
       DeskScene.tsx       Scene 02 geometry (desk, monitor wake, character, room shell)
@@ -119,14 +124,20 @@ are all covered in [docs/](#documentation) above rather than duplicated here.
 
 All geometry right now is built from primitives (boxes, cones, capsules) —
 there are no external `.glb` models yet. This keeps things dependency-free
-while the scaffold is being validated. Swapping in real models later is a
-drop-in change scoped to each scene file (e.g. `IntroScene.tsx`'s/
-`DeskScene.tsx`'s `Character` components) and doesn't touch the scroll/camera
-architecture.
+while the scaffold is being validated. The character (used across 4 scenes)
+already goes through a shared loader,
+[CharacterModel.tsx](components/world/CharacterModel.tsx), that renders a
+real GLTF model the moment one is configured and falls back to the current
+primitive otherwise — see [docs/3D_MODELS.md](docs/3D_MODELS.md) for the
+full guide on sourcing/adding one. Other props (the desk, server racks,
+mountains, ...) would follow the same pattern but don't have a shared loader
+yet since only the character currently repeats across scenes.
 
 ## What's next
 
-- Guide for creating/sourcing the character and prop 3D models
+- Real GLTF character model — the scaffold (`CharacterModel.tsx`,
+  `constants/character.ts`) is ready; see
+  [docs/3D_MODELS.md](docs/3D_MODELS.md)
 - The 2D case-study layer for Scene 04's projects (problem/solution/
   architecture/screenshots per spec §13) — currently only the 3D reveal
   (title/tagline/stack) exists
