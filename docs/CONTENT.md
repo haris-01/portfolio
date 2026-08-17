@@ -13,7 +13,8 @@ any component or knowing React.
   like `#about`; these will point at real sections/pages as they're built).
 - `SOCIAL_LINKS` — GitHub / LinkedIn / email. **These are still placeholders**
   (`your-username`, `you@example.com`) — replace with real links before
-  shipping.
+  shipping. Used in both `LandscapeText.tsx` (the closing scene) and
+  `StaticFallback.tsx`'s contact section.
 
 ## Per-scene content
 
@@ -49,6 +50,19 @@ scene's components:
   pipeline, one per drifting stage marker. Same length-matching note: must
   match `STAGE_COUNT` in
   [components/world/scenes/aiLabLayout.ts](../components/world/scenes/aiLabLayout.ts).
+- [constants/scenes/experiment.ts](../constants/scenes/experiment.ts) —
+  `EXPERIMENT_SCENE.experiments`, an ordered array of `{ name, description }`
+  entries, one per spinning prototype shape. Same length-matching note: must
+  match `ITEM_COUNT` in
+  [components/world/scenes/experimentLayout.ts](../components/world/scenes/experimentLayout.ts).
+- [constants/scenes/whiteRoom.ts](../constants/scenes/whiteRoom.ts) —
+  `WHITE_ROOM_SCENE.statement`, an array of lines for the single emotional
+  statement (design spec §18 — keep it short; this scene is deliberately
+  almost empty).
+- [constants/scenes/landscape.ts](../constants/scenes/landscape.ts) —
+  `LANDSCAPE_SCENE.cta`, the closing headline. The GitHub/LinkedIn/Email
+  links below it come from `constants/site.ts`'s `SOCIAL_LINKS`, not from
+  this file.
 
 To change what appears in a scene, edit its constants file only — no
 component changes needed.
@@ -88,3 +102,6 @@ once. Every scene and every DOM element using that token updates together.
   are generic/systems-agnostic by design rather than placeholders needing
   real content — unlike hallway/lab, there's nothing project-specific to
   swap in here.
+- Scene 07's experiment list is a reasonable starting set matching the
+  design spec's examples (§17) but is worth personalizing — swap in
+  whatever this engineer actually tinkers with.

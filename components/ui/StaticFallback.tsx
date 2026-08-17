@@ -4,6 +4,9 @@ import { HALLWAY_SCENE } from '@/constants/scenes/hallway';
 import { LAB_SCENE } from '@/constants/scenes/lab';
 import { ENGINEERING_SCENE } from '@/constants/scenes/engineering';
 import { AI_LAB_SCENE } from '@/constants/scenes/ai';
+import { EXPERIMENT_SCENE } from '@/constants/scenes/experiment';
+import { WHITE_ROOM_SCENE } from '@/constants/scenes/whiteRoom';
+import { LANDSCAPE_SCENE } from '@/constants/scenes/landscape';
 
 // Non-cinematic, stacked presentation of every scene's content — used when
 // prefers-reduced-motion is set (spec §28: "replace cinematic camera
@@ -102,8 +105,28 @@ export default function StaticFallback() {
         </ol>
       </section>
 
+      <section id='lab' className='min-h-screen flex flex-col items-center justify-center px-6'>
+        <h3 className='text-xs font-mono uppercase tracking-widest text-warmgray mb-8'>Experiments</h3>
+        <ol className='flex flex-col gap-6 text-center max-w-md'>
+          {EXPERIMENT_SCENE.experiments.map((item) => (
+            <li key={item.name}>
+              <p className='font-mono text-lg md:text-xl font-bold tracking-widest text-accent'>{item.name}</p>
+              <p className='mt-1 text-sm text-warmgray'>{item.description}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className='min-h-screen flex flex-col items-center justify-center text-center px-6'>
+        {WHITE_ROOM_SCENE.statement.map((line, i) => (
+          <p key={i} className='text-2xl md:text-4xl font-bold tracking-tight text-ink'>
+            {line}
+          </p>
+        ))}
+      </section>
+
       <section id='contact' className='min-h-screen flex flex-col items-center justify-center text-center px-6'>
-        <h3 className='text-2xl md:text-3xl font-bold tracking-tight text-ink'>Let&apos;s build something.</h3>
+        <h3 className='text-2xl md:text-3xl font-bold tracking-tight text-ink'>{LANDSCAPE_SCENE.cta}</h3>
         <ul className='mt-6 flex gap-6 text-sm font-mono uppercase tracking-widest'>
           <li>
             <a href={SOCIAL_LINKS.github} className='text-warmgray hover:text-accent transition-colors'>

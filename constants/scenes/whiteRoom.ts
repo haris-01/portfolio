@@ -1,0 +1,3 @@
+export const WHITE_ROOM_SCENE = {
+  statement: ['I LIKE TURNING', 'COMPLICATED SYSTEMS', 'INTO SIMPLE EXPERIENCES.'],
+};

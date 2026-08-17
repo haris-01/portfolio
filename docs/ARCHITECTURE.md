@@ -53,12 +53,12 @@ writes; everything else reads.
 ## Camera choreography
 
 [components/world/ScrollRig.tsx](../components/world/ScrollRig.tsx) owns the
-camera. The path is a sequence of **waypoints** — `WAYPOINTS` is `[{ at: 0,
-pos, look }, { at: 1/6, ... }, { at: 2/6, ... }, { at: 3/6, ... }, { at: 4/6,
-... }, { at: 5/6, ... }, { at: 1, ... }]`, one entry per scene boundary
-(currently: outside → workshop entrance → desk → hallway entrance → lab
-entrance → engineering entrance → last AI lab marker). On every frame,
-`ScrollRig`:
+camera. The path is a sequence of **waypoints**, one entry per scene
+boundary (nine scenes → ten waypoints: `{ at: 0, ... }` through `{ at: 1,
+... }`, with `{ at: 1/9, ... }`, `{ at: 2/9, ... }`, ... at every boundary in
+between) — outside → workshop entrance → desk → hallway entrance → lab
+entrance → engineering entrance → AI lab entrance → experiment room entrance
+→ white room entrance → last landscape frame. On every frame, `ScrollRig`:
 
 1. Finds whichever two waypoints bracket the current `scrollState.progress`.
 2. Eases the local position between them through `easeInOutCubic` (never a
@@ -77,10 +77,10 @@ in `WorldCanvas.tsx` — portrait viewports need a different composition, not
 just a scaled-down desktop shot. See
 [components/world/WorldCanvas.tsx](../components/world/WorldCanvas.tsx).
 
-`lib/scrollState.ts` exports `SCENE_BOUNDS` (currently `{ intro: [0, 1/6],
-desk: [1/6, 2/6], hallway: [2/6, 3/6], lab: [3/6, 4/6], engineering: [4/6,
-5/6], aiLab: [5/6, 1] }`) and `localProgress(global, start, end)`, which
-every scene and DOM-text
+`lib/scrollState.ts` exports `SCENE_BOUNDS` — nine equal ninths, one per
+scene (`intro`, `desk`, `hallway`, `lab`, `engineering`, `aiLab`,
+`experiment`, `whiteRoom`, `landscape`) — and `localProgress(global, start,
+end)`, which every scene and DOM-text
 component uses to map the shared
 global progress into its own local `0–1` range — see how `DeskScene`'s
 monitor-wake `useFrame` and `DeskText`'s reveal timing both do this. **A
@@ -127,6 +127,26 @@ height too, so the final waypoint derives all three axes from
 layout function a scene introduces should be treated as the single source of
 truth for that scene's positions — camera waypoints read from it, never
 duplicate or approximate its output.
+
+## Two DOM-text reveal shapes, and a bug that recurs across both
+
+Text overlays come in two shapes. **Cyclic** (`HallwayText`, `EngineeringText`,
+`AiLabText`, `ExperimentText`) reveal one item at a time as the camera passes
+a series of markers; each item's own fade-out (built into the symmetric
+`fadeIn`/`fadeOut` window math) naturally clears it before the next item
+appears, so nothing extra is needed at the scene boundary. **Single-reveal**
+(`IntroText`, `DeskText`, `WhiteRoomText`) reveal once and hold — there's no
+"next item" to trigger a fade, so without an explicit fade-out they stay at
+full opacity forever, including on top of whatever the next scene reveals.
+`DeskText` needed this fix when Scene 03 was added (see the desk/hallway
+overlap in an earlier revision of this file's history); `WhiteRoomText`
+needed the identical fix when Scene 09 was added — its statement was still
+on screen, opacity 1, when the landscape's closing CTA faded in on top of
+it. Both fixed the same way: compute the *next* scene's `localProgress` and
+multiply the reveal by `(1 - fadeOut)`. **Any new single-reveal text
+component needs this from the start, not as an after-the-fact patch** — check
+whether the text is cyclic or single-reveal before writing it, and if
+single-reveal, write the fade-out in the same pass as the reveal.
 
 ## Theming
 
