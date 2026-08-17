@@ -4,25 +4,18 @@ import { useRef } from 'react';
 import { HALLWAY_SCENE } from '@/constants/scenes/hallway';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 
-type HallwayTextProps = {
-  reducedMotion: boolean;
-};
-
 const DOOR_WINDOW = 1 / HALLWAY_SCENE.stages.length;
 const FADE_MARGIN = DOOR_WINDOW * 0.15;
 
-export default function HallwayText({ reducedMotion }: HallwayTextProps) {
+// Only ever rendered as part of the cinematic experience (pages/index.tsx's
+// showCinematic) — the reduced-motion path renders StaticFallback instead.
+export default function HallwayText() {
   const rafRef = useRef<number | null>(null);
   const yearRef = useRef<HTMLParagraphElement>(null);
   const roleRef = useRef<HTMLParagraphElement>(null);
   const lastIndex = useRef(-1);
 
   useGSAP(() => {
-    if (reducedMotion) {
-      gsap.set('.hallway-label', { opacity: 0 });
-      return;
-    }
-
     gsap.set('.hallway-label', { opacity: 0 });
 
     const tick = () => {
@@ -52,7 +45,7 @@ export default function HallwayText({ reducedMotion }: HallwayTextProps) {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className='pointer-events-none fixed inset-0 z-10 flex flex-col items-center justify-end pb-16 md:pb-24 text-center'>

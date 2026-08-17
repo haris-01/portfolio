@@ -5,26 +5,18 @@ import { useRef } from 'react';
 import { INTRO_SCENE } from '@/constants/scenes/intro';
 import { scrollState, easeInOutCubic, localProgress, SCENE_BOUNDS } from '@/lib/scrollState';
 
-type IntroTextProps = {
-  reducedMotion: boolean;
-};
-
 // text reveals in the final stretch of the approach, once the entrance is
 // close, then fades back out as the camera moves on into the next scene
 const REVEAL_START = 0.75;
 const FADE_OUT_SPAN = 0.15; // fraction of the *next* scene's local progress
 
-export default function IntroText({ reducedMotion }: IntroTextProps) {
+// Only ever rendered as part of the cinematic experience (pages/index.tsx's
+// showCinematic) — the reduced-motion path renders StaticFallback instead.
+export default function IntroText() {
   const rafRef = useRef<number | null>(null);
 
   useGSAP(() => {
     const split = new SplitText('.intro-name', { type: 'chars' });
-
-    if (reducedMotion) {
-      gsap.set(split.chars, { yPercent: 0, opacity: 1 });
-      gsap.set(['.intro-role', '.intro-tagline'], { opacity: 1, y: 0 });
-      return;
-    }
 
     gsap.set(split.chars, { yPercent: 100, opacity: 0 });
     gsap.set(['.intro-role', '.intro-tagline'], { opacity: 0, y: 12 });
@@ -47,7 +39,7 @@ export default function IntroText({ reducedMotion }: IntroTextProps) {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className='pointer-events-none fixed inset-0 z-10 flex flex-col items-center justify-end pb-24 md:pb-32 text-center'>

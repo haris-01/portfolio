@@ -8,6 +8,7 @@ import IntroText from '@/components/ui/IntroText';
 import DeskText from '@/components/ui/DeskText';
 import HallwayText from '@/components/ui/HallwayText';
 import LabText from '@/components/ui/LabText';
+import StaticFallback from '@/components/ui/StaticFallback';
 import { SITE } from '@/constants/site';
 import { scrollState } from '@/lib/scrollState';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -26,8 +27,16 @@ export default function Home() {
   const isMobile = useIsMobile();
   const triggerRef = useRef<HTMLDivElement>(null);
 
+  // The cinematic scroll-driven 3D experience only runs when WebGL is
+  // available AND the visitor hasn't asked for reduced motion — spec §28
+  // calls for normal section transitions instead of the scroll-jacked
+  // camera in that case, not just a frozen first frame of it. Every text
+  // overlay component below (IntroText, DeskText, ...) is therefore only
+  // ever mounted with reducedMotion=false in practice.
+  const showCinematic = webglSupported !== false && !reducedMotion;
+
   useGSAP(() => {
-    if (reducedMotion) return;
+    if (!showCinematic) return;
 
     const st = gsap.timeline({
       scrollTrigger: {
@@ -44,9 +53,7 @@ export default function Home() {
     return () => {
       st.scrollTrigger?.kill();
     };
-  }, [reducedMotion]);
-
-  const showWorld = webglSupported !== false;
+  }, [showCinematic]);
 
   return (
     <>
@@ -63,27 +70,19 @@ export default function Home() {
       <main className='bg-background'>
         <h1 className='sr-only'>{`${SITE.name} — ${SITE.role}`}</h1>
 
-        {showWorld ? (
+        {showCinematic ? (
           <>
             <div className='fixed inset-0 z-0'>
-              <WorldCanvas simplified={isMobile} reducedMotion={reducedMotion} />
+              <WorldCanvas simplified={isMobile} />
             </div>
-            <IntroText reducedMotion={reducedMotion} />
-            <DeskText reducedMotion={reducedMotion} />
-            <HallwayText reducedMotion={reducedMotion} />
-            <LabText reducedMotion={reducedMotion} />
+            <IntroText />
+            <DeskText />
+            <HallwayText />
+            <LabText />
             <div id='scroll-trigger' ref={triggerRef} className='relative h-[1600vh]' />
           </>
         ) : (
-          <section className='min-h-screen flex flex-col items-center justify-center text-center px-6'>
-            <h2 className='text-4xl md:text-6xl font-bold tracking-tight text-ink'>
-              {SITE.name}
-            </h2>
-            <p className='mt-3 text-lg md:text-xl text-ink'>{SITE.role}</p>
-            <p className='mt-1 text-xs md:text-sm font-mono uppercase tracking-widest text-warmgray'>
-              {SITE.tagline}
-            </p>
-          </section>
+          <StaticFallback />
         )}
       </main>
     </>

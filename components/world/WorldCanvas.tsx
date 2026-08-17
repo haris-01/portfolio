@@ -8,10 +8,12 @@ import ScrollRig from '@/components/world/ScrollRig';
 
 type WorldCanvasProps = {
   simplified: boolean;
-  reducedMotion: boolean;
 };
 
-export default function WorldCanvas({ simplified, reducedMotion }: WorldCanvasProps) {
+// Only ever mounted for the cinematic experience (pages/index.tsx's
+// showCinematic) — the reduced-motion path renders StaticFallback instead,
+// so this component never needs to render a non-scroll-driven variant.
+export default function WorldCanvas({ simplified }: WorldCanvasProps) {
   return (
     <Canvas
       shadows={!simplified}
@@ -29,7 +31,7 @@ export default function WorldCanvas({ simplified, reducedMotion }: WorldCanvasPr
       <DeskScene simplified={simplified} />
       <HallwayScene simplified={simplified} />
       <LabScene simplified={simplified} />
-      {!reducedMotion && <ScrollRig simplified={simplified} />}
+      <ScrollRig simplified={simplified} />
     </Canvas>
   );
 }

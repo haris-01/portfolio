@@ -149,22 +149,40 @@ Three hooks in [hooks/](../hooks) gate the experience, all built on
 render on mount):
 
 - **`useReducedMotion`** — when `prefers-reduced-motion: reduce` is set,
-  `ScrollRig` isn't even mounted (`pages/index.tsx` conditionally renders it)
-  and `IntroText` skips its `requestAnimationFrame` loop, setting the final
-  revealed state immediately instead. The scene still renders — just as a
-  single static shot.
+  `pages/index.tsx`'s `showCinematic` flips false and the entire 3D
+  experience — `WorldCanvas`, every scene, every scroll-synced text overlay —
+  simply isn't mounted. `StaticFallback` renders instead: every scene's
+  content (name/role, desk copy + stack, the hallway's career timeline, the
+  lab's projects, contact links) stacked as normal, non-scroll-jacked
+  document sections, spec §28's "replace cinematic camera movement with
+  normal section transitions" taken literally rather than as a frozen first
+  frame of the cinematic version.
 - **`useWebGLSupport`** — probes for a WebGL context once. If unsupported,
-  `pages/index.tsx` renders a plain 2D DOM section instead of mounting
-  `WorldCanvas` at all.
+  `showCinematic` is also false and the same `StaticFallback` renders — one
+  fallback component serves both cases, since neither has anything to do
+  with the 3D canvas.
 - **`useIsMobile`** — coarse pointer or narrow viewport. Threaded through as
   a `simplified` prop: fewer trees, no shadows, capped `dpr`, wider FOV,
-  closer camera path.
+  closer camera path. Only relevant when `showCinematic` is true —
+  `StaticFallback` is a normal responsive page, no special mobile handling
+  needed.
+
+Because `IntroText`/`DeskText`/`HallwayText`/`LabText`/`WorldCanvas` are only
+ever mounted when `showCinematic` is true, none of them accept or branch on
+a `reducedMotion` prop — that used to exist on each of them individually
+(each with its own "if reduced motion, do X instead" branch), which meant
+four different partial, inconsistent implementations of the same fallback
+concept. Consolidating to one `showCinematic` boolean at the page level and
+one `StaticFallback` component removed all of that dead branching in one
+pass — if you find yourself adding a `reducedMotion` check inside a
+scroll-synced component, that's a sign the logic belongs in `pages/index.tsx`
+instead.
 
 The name/role heading is real DOM content, never canvas-only text. The page's
 single `<h1>` is a visually-hidden (`sr-only`) element in `pages/index.tsx`
-that's always present; `IntroText`'s large on-screen name is a styled `<p>` so
-there's exactly one `<h1>` on the page regardless of which layer (3D or 2D
-fallback) is active.
+that's always present; `IntroText`'s large on-screen name (cinematic) and
+`StaticFallback`'s `<h2>` (fallback) are both non-`<h1>` elements, so there's
+exactly one `<h1>` on the page regardless of which layer is active.
 
 ## Adding a new scene
 

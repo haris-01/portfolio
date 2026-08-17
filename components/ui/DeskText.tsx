@@ -4,10 +4,6 @@ import { useRef } from 'react';
 import { DESK_SCENE } from '@/constants/scenes/desk';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 
-type DeskTextProps = {
-  reducedMotion: boolean;
-};
-
 // screen copy reveals first, then the tech stack chips, in the back half of
 // the desk scene's local progress range, then both fade out as the camera
 // moves on into the hallway
@@ -15,18 +11,12 @@ const COPY_RANGE: [number, number] = [0.55, 0.8];
 const STACK_RANGE: [number, number] = [0.8, 1];
 const FADE_OUT_SPAN = 0.15; // fraction of the *next* scene's local progress
 
-export default function DeskText({ reducedMotion }: DeskTextProps) {
+// Only ever rendered as part of the cinematic experience (pages/index.tsx's
+// showCinematic) — the reduced-motion path renders StaticFallback instead.
+export default function DeskText() {
   const rafRef = useRef<number | null>(null);
 
   useGSAP(() => {
-    if (reducedMotion) {
-      // the reduced-motion fallback is a single static shot of Scene 01;
-      // later scenes stay hidden until a proper non-cinematic, stacked
-      // fallback layout exists for the full journey (see docs/ARCHITECTURE.md)
-      gsap.set('.desk-copy, .desk-stack', { opacity: 0, y: 10 });
-      return;
-    }
-
     gsap.set('.desk-copy, .desk-stack', { opacity: 0, y: 10 });
 
     const tick = () => {
@@ -46,7 +36,7 @@ export default function DeskText({ reducedMotion }: DeskTextProps) {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className='pointer-events-none fixed inset-0 z-10 flex flex-col items-center justify-end pb-16 md:pb-24 text-center px-6'>

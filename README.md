@@ -83,8 +83,11 @@ components/
     DeskText.tsx           desk-screen copy + tech stack reveal, synced to scrollState
     HallwayText.tsx         per-door year/role label, synced to scrollState
     LabText.tsx              per-project title/tagline/stack reveal, synced to scrollState
+    StaticFallback.tsx        every scene's content, stacked, no canvas/scroll-jacking —
+                               used for reduced-motion and no-WebGL visitors
 pages/
-  index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer
+  index.tsx              page shell: mounts WorldCanvas + text layers + the scroll spacer,
+                          or StaticFallback, depending on showCinematic
 ```
 
 Content editing, the accessibility/fallback system, and camera choreography
@@ -99,21 +102,12 @@ drop-in change scoped to each scene file (e.g. `IntroScene.tsx`'s/
 `DeskScene.tsx`'s `Character` components) and doesn't touch the scroll/camera
 architecture.
 
-## Known limitation
-
-The reduced-motion fallback currently only presents Scene 01 as a static
-shot; Scene 02+ content stays hidden in that mode rather than animating in
-(see the note in `DeskText.tsx`/`HallwayText.tsx`). A proper non-cinematic,
-stacked fallback that surfaces every scene's content without the
-scroll-driven camera is tracked as follow-up work.
-
 ## What's next
 
 - Guide for creating/sourcing the character and prop 3D models
 - Scene 05 (Engineering Room) and onward, following the same
   read-the-shared-scrollState pattern established here (see
   [docs/ADDING_A_SCENE.md](docs/ADDING_A_SCENE.md))
-- A real reduced-motion fallback that covers every scene, not just Scene 01
 - The 2D case-study layer for Scene 04's projects (problem/solution/
   architecture/screenshots per spec §13) — currently only the 3D reveal
   (title/tagline/stack) exists

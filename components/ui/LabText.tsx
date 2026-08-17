@@ -4,14 +4,12 @@ import { useRef } from 'react';
 import { LAB_SCENE } from '@/constants/scenes/lab';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 
-type LabTextProps = {
-  reducedMotion: boolean;
-};
-
 const POD_WINDOW = 1 / LAB_SCENE.projects.length;
 const FADE_MARGIN = POD_WINDOW * 0.15;
 
-export default function LabText({ reducedMotion }: LabTextProps) {
+// Only ever rendered as part of the cinematic experience (pages/index.tsx's
+// showCinematic) — the reduced-motion path renders StaticFallback instead.
+export default function LabText() {
   const rafRef = useRef<number | null>(null);
   const titleRef = useRef<HTMLParagraphElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
@@ -19,11 +17,6 @@ export default function LabText({ reducedMotion }: LabTextProps) {
   const lastIndex = useRef(-1);
 
   useGSAP(() => {
-    if (reducedMotion) {
-      gsap.set('.lab-label', { opacity: 0 });
-      return;
-    }
-
     gsap.set('.lab-label', { opacity: 0 });
 
     const tick = () => {
@@ -53,7 +46,7 @@ export default function LabText({ reducedMotion }: LabTextProps) {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className='pointer-events-none fixed inset-0 z-10 flex flex-col items-center justify-end pb-16 md:pb-24 text-center px-6'>
