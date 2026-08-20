@@ -1,10 +1,5 @@
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 import { THEME } from '@/lib/theme';
-import CharacterModel from '@/components/world/CharacterModel';
-import { LANDSCAPE_START_Z, LANDSCAPE_END_Z, CHARACTER_START_Z, CHARACTER_END_Z } from './landscapeLayout';
+import { LANDSCAPE_START_Z, LANDSCAPE_END_Z } from './landscapeLayout';
 
 type LandscapeSceneProps = {
   simplified: boolean;
@@ -34,28 +29,10 @@ function Mountains() {
   );
 }
 
-function Traveler({ simplified }: { simplified: boolean }) {
-  const group = useRef<THREE.Group>(null);
-
-  useFrame(() => {
-    if (!group.current) return;
-    const local = localProgress(scrollState.progress, SCENE_BOUNDS.landscape[0], SCENE_BOUNDS.landscape[1]);
-    const z = THREE.MathUtils.lerp(CHARACTER_START_Z, CHARACTER_END_Z, easeInOutCubic(local));
-    group.current.position.set(0, 0, z);
-  });
-
-  return (
-    <group ref={group}>
-      <CharacterModel simplified={simplified} />
-    </group>
-  );
-}
-
-export default function LandscapeScene({ simplified }: LandscapeSceneProps) {
+export default function LandscapeScene(_props: LandscapeSceneProps) {
   return (
     <>
       <Mountains />
-      <Traveler simplified={simplified} />
     </>
   );
 }

@@ -22,3 +22,22 @@ export function stagePosition(index: number): [number, number, number] {
   const y = 1.4 + Math.cos(index * 1.6) * 0.6;
   return [x, y, z];
 }
+
+// The former standalone "Experiment" scene, folded into a brief beat at the
+// tail of AI lab's local progress rather than its own SCENE_BOUNDS entry —
+// see docs/DESIGN_DIRECTION.md Rev. 2. EXPERIMENT_BEAT_START is the single
+// source of truth for where the beat begins within aiLab's local progress;
+// AiLabScene.tsx and AiLabText.tsx both import it rather than duplicating it.
+export const EXPERIMENT_ITEM_COUNT = 6;
+export const EXPERIMENT_ITEM_SPACING = 6;
+export const EXPERIMENT_FIRST_ITEM_Z = AI_LAB_END_Z - 4;
+export const EXPERIMENT_LAST_ITEM_Z =
+  EXPERIMENT_FIRST_ITEM_Z - (EXPERIMENT_ITEM_COUNT - 1) * EXPERIMENT_ITEM_SPACING;
+export const AI_LAB_EXIT_END_Z = EXPERIMENT_LAST_ITEM_Z - 6;
+export const EXPERIMENT_BEAT_START = 0.82;
+
+export function experimentItemPosition(index: number): [number, number] {
+  const z = EXPERIMENT_FIRST_ITEM_Z - index * EXPERIMENT_ITEM_SPACING;
+  const x = index % 2 === 0 ? 1.6 : -1.6;
+  return [x, z];
+}

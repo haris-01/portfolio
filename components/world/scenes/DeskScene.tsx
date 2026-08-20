@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 import { THEME } from '@/lib/theme';
-import CharacterModel from '@/components/world/CharacterModel';
 
 type DeskSceneProps = {
   simplified: boolean;
@@ -113,14 +112,11 @@ function Desk() {
   );
 }
 
-export default function DeskScene({ simplified }: DeskSceneProps) {
+export default function DeskScene(_props: DeskSceneProps) {
   return (
     <>
       <Room />
       <Desk />
-      <group position={[0, 0, DESK_Z + 0.7]}>
-        <CharacterModel simplified={simplified} seated />
-      </group>
     </>
   );
 }
