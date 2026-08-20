@@ -2,13 +2,23 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useRef } from 'react';
 import { AI_LAB_SCENE } from '@/constants/scenes/ai';
+import { EXPERIMENT_SCENE } from '@/constants/scenes/experiment';
+import { EXPERIMENT_BEAT_START } from '@/components/world/scenes/aiLabLayout';
 import { scrollState, localProgress, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 
-const STAGE_WINDOW = 1 / AI_LAB_SCENE.stages.length;
-const FADE_MARGIN = STAGE_WINDOW * 0.15;
+const STAGE_COUNT = AI_LAB_SCENE.stages.length;
+const BEAT_COUNT = EXPERIMENT_SCENE.experiments.length;
+const STAGE_WINDOW = EXPERIMENT_BEAT_START / STAGE_COUNT;
+const BEAT_WINDOW = (1 - EXPERIMENT_BEAT_START) / BEAT_COUNT;
 
 // Only ever rendered as part of the cinematic experience (pages/index.tsx's
 // showCinematic) — the reduced-motion path renders StaticFallback instead.
+//
+// Cycles through the RAG pipeline stages, then — once local progress passes
+// EXPERIMENT_BEAT_START — through the folded "experiment" beat items, which
+// used to be a standalone scene/text component (ExperimentText). Both lists
+// share this one label so the beat reads as part of AI lab, not a separate
+// stop (docs/DESIGN_DIRECTION.md Rev. 2).
 export default function AiLabText() {
   const rafRef = useRef<number | null>(null);
   const nameRef = useRef<HTMLParagraphElement>(null);
@@ -20,18 +30,35 @@ export default function AiLabText() {
 
     const tick = () => {
       const local = localProgress(scrollState.progress, SCENE_BOUNDS.aiLab[0], SCENE_BOUNDS.aiLab[1]);
-      const index = Math.min(Math.floor(local / STAGE_WINDOW), AI_LAB_SCENE.stages.length - 1);
 
-      if (index !== lastIndex.current && nameRef.current && descriptionRef.current) {
-        const stage = AI_LAB_SCENE.stages[index];
-        nameRef.current.textContent = stage.name;
-        descriptionRef.current.textContent = stage.description;
-        lastIndex.current = index;
+      let windowStart: number;
+      let windowSize: number;
+      let combinedIndex: number;
+      let item: { name: string; description: string };
+
+      if (local < EXPERIMENT_BEAT_START) {
+        const index = Math.min(Math.floor(local / STAGE_WINDOW), STAGE_COUNT - 1);
+        windowStart = index * STAGE_WINDOW;
+        windowSize = STAGE_WINDOW;
+        combinedIndex = index;
+        item = AI_LAB_SCENE.stages[index];
+      } else {
+        const beatIndex = Math.min(Math.floor((local - EXPERIMENT_BEAT_START) / BEAT_WINDOW), BEAT_COUNT - 1);
+        windowStart = EXPERIMENT_BEAT_START + beatIndex * BEAT_WINDOW;
+        windowSize = BEAT_WINDOW;
+        combinedIndex = STAGE_COUNT + beatIndex;
+        item = EXPERIMENT_SCENE.experiments[beatIndex];
       }
 
-      const withinWindow = local / STAGE_WINDOW - index;
-      const fadeIn = easeInOutCubic(localProgress(withinWindow, 0, FADE_MARGIN / STAGE_WINDOW));
-      const fadeOut = 1 - easeInOutCubic(localProgress(withinWindow, 1 - FADE_MARGIN / STAGE_WINDOW, 1));
+      if (combinedIndex !== lastIndex.current && nameRef.current && descriptionRef.current) {
+        nameRef.current.textContent = item.name;
+        descriptionRef.current.textContent = item.description;
+        lastIndex.current = combinedIndex;
+      }
+
+      const withinWindow = (local - windowStart) / windowSize;
+      const fadeIn = easeInOutCubic(localProgress(withinWindow, 0, 0.15));
+      const fadeOut = 1 - easeInOutCubic(localProgress(withinWindow, 0.85, 1));
       const opacity = local <= 0 ? 0 : Math.min(fadeIn, fadeOut);
 
       gsap.set('.ai-lab-label', { opacity });

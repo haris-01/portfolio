@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollState, easeInOutCubic, localProgress, SCENE_BOUNDS } from '@/lib/scrollState';
 import { THEME } from '@/lib/theme';
-import CharacterModel from '@/components/world/CharacterModel';
 
 type IntroSceneProps = {
   simplified: boolean;
@@ -77,9 +76,6 @@ export default function IntroScene({ simplified }: IntroSceneProps) {
   return (
     <>
       <Workshop />
-      <group position={[1.4, 0, -8]}>
-        <CharacterModel simplified={simplified} />
-      </group>
       {trees.map((position, i) => (
         <Tree key={i} position={position} />
       ))}
