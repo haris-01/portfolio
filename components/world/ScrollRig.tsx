@@ -5,15 +5,16 @@ import { scrollState, easeInOutCubic, SCENE_BOUNDS } from '@/lib/scrollState';
 import { HALLWAY_END_Z } from '@/components/world/scenes/hallwayLayout';
 import { LAST_POD_Z, POD_COUNT, podPosition } from '@/components/world/scenes/labLayout';
 import { LAST_NODE_Z, NODE_COUNT, nodePosition } from '@/components/world/scenes/engineeringLayout';
-import { STAGE_COUNT, stagePosition } from '@/components/world/scenes/aiLabLayout';
-import { ITEM_COUNT, itemPosition } from '@/components/world/scenes/experimentLayout';
+import {
+  EXPERIMENT_ITEM_COUNT,
+  experimentItemPosition,
+} from '@/components/world/scenes/aiLabLayout';
 import { WHITE_ROOM_CHARACTER_Z } from '@/components/world/scenes/whiteRoomLayout';
 import { CHARACTER_END_Z } from '@/components/world/scenes/landscapeLayout';
 
 const [LAST_POD_X] = podPosition(POD_COUNT - 1);
 const [LAST_NODE_X] = nodePosition(NODE_COUNT - 1);
-const [LAST_STAGE_X, LAST_STAGE_Y, LAST_STAGE_Z] = stagePosition(STAGE_COUNT - 1);
-const [LAST_ITEM_X, LAST_ITEM_Z] = itemPosition(ITEM_COUNT - 1);
+const [LAST_ITEM_X, LAST_ITEM_Z] = experimentItemPosition(EXPERIMENT_ITEM_COUNT - 1);
 
 type ScrollRigProps = {
   simplified: boolean;
@@ -26,10 +27,11 @@ type Waypoint = {
 };
 
 // The camera path is a sequence of waypoints, one per scene boundary,
-// carrying the visitor through all nine scenes: outside -> workshop
-// entrance -> desk -> hallway -> lab -> engineering room -> AI lab ->
-// experiment room -> white room -> landscape. Portrait/mobile framing sits
-// closer at every leg so the scene fills a tall, narrow viewport instead of
+// carrying the visitor through all eight scenes: outside -> workshop
+// entrance -> desk -> hallway -> lab -> engineering room -> AI lab (which
+// includes a brief folded "experiment" beat near its exit, not its own
+// waypoint) -> white room -> landscape. Portrait/mobile framing sits closer
+// at every leg so the scene fills a tall, narrow viewport instead of
 // leaving empty ground around it.
 const WAYPOINTS: Waypoint[] = [
   { at: 0, pos: [0, 3, 22], look: [0, 3, -14] },
@@ -38,11 +40,6 @@ const WAYPOINTS: Waypoint[] = [
   { at: SCENE_BOUNDS.lab[0], pos: [0, 1.7, HALLWAY_END_Z + 5], look: [0, 1.6, HALLWAY_END_Z + 1] },
   { at: SCENE_BOUNDS.engineering[0], pos: [LAST_POD_X * 0.4, 2, LAST_POD_Z + 6], look: [LAST_POD_X, 1.8, LAST_POD_Z] },
   { at: SCENE_BOUNDS.aiLab[0], pos: [LAST_NODE_X * 0.4, 2, LAST_NODE_Z + 5], look: [LAST_NODE_X, 1.6, LAST_NODE_Z] },
-  {
-    at: SCENE_BOUNDS.experiment[0],
-    pos: [LAST_STAGE_X * 0.5, LAST_STAGE_Y + 0.6, LAST_STAGE_Z + 5],
-    look: [LAST_STAGE_X, LAST_STAGE_Y, LAST_STAGE_Z],
-  },
   {
     at: SCENE_BOUNDS.whiteRoom[0],
     pos: [LAST_ITEM_X * 0.4, 1.8, LAST_ITEM_Z + 5],
@@ -63,11 +60,6 @@ const WAYPOINTS_MOBILE: Waypoint[] = [
   { at: SCENE_BOUNDS.lab[0], pos: [0, 1.7, HALLWAY_END_Z + 5], look: [0, 1.6, HALLWAY_END_Z + 1] },
   { at: SCENE_BOUNDS.engineering[0], pos: [LAST_POD_X * 0.4, 2, LAST_POD_Z + 6], look: [LAST_POD_X, 1.8, LAST_POD_Z] },
   { at: SCENE_BOUNDS.aiLab[0], pos: [LAST_NODE_X * 0.4, 2, LAST_NODE_Z + 5], look: [LAST_NODE_X, 1.6, LAST_NODE_Z] },
-  {
-    at: SCENE_BOUNDS.experiment[0],
-    pos: [LAST_STAGE_X * 0.5, LAST_STAGE_Y + 0.6, LAST_STAGE_Z + 5],
-    look: [LAST_STAGE_X, LAST_STAGE_Y, LAST_STAGE_Z],
-  },
   {
     at: SCENE_BOUNDS.whiteRoom[0],
     pos: [LAST_ITEM_X * 0.4, 1.8, LAST_ITEM_Z + 5],
