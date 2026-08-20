@@ -10,7 +10,6 @@ import HallwayText from '@/components/ui/HallwayText';
 import LabText from '@/components/ui/LabText';
 import EngineeringText from '@/components/ui/EngineeringText';
 import AiLabText from '@/components/ui/AiLabText';
-import ExperimentText from '@/components/ui/ExperimentText';
 import WhiteRoomText from '@/components/ui/WhiteRoomText';
 import LandscapeText from '@/components/ui/LandscapeText';
 import StaticFallback from '@/components/ui/StaticFallback';
@@ -86,7 +85,6 @@ export default function Home() {
             <LabText />
             <EngineeringText />
             <AiLabText />
-            <ExperimentText />
             <WhiteRoomText />
             <LandscapeText />
             <div id='scroll-trigger' ref={triggerRef} className='relative h-[3600vh]' />
